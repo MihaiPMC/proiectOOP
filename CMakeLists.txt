@@ -6,6 +6,10 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Define installation directories
+set(BIN_DIR "bin" CACHE STRING "Binary installation directory")
+set(DESTINATION_DIR "${BIN_DIR}" CACHE STRING "Installation destination directory")
+
 # For macOS, we need to handle special requirements BEFORE any targets are created
 if(APPLE)
     # Set preprocessor definitions globally
@@ -41,6 +45,9 @@ endif()
 
 # Create the executable
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} ${PROJECT_HEADERS})
+
+# Set the output name to match the expected executable name in GitHub Actions
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "oop")
 
 # Specify include directories
 target_include_directories(${PROJECT_NAME} PRIVATE src)
@@ -194,5 +201,20 @@ copy_files(
 # Set working directory for Visual Studio
 set_property(TARGET ${PROJECT_NAME} PROPERTY VS_DEBUGGER_WORKING_DIRECTORY $<TARGET_FILE_DIR:${PROJECT_NAME}>)
 
-# Install configuration
+# Install configuration - important for GitHub Actions artifacts
 install(TARGETS ${PROJECT_NAME} DESTINATION ${DESTINATION_DIR})
+
+# Install additional files needed by the application (for GitHub Actions)
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/assets" 
+        DESTINATION ${DESTINATION_DIR}
+        FILES_MATCHING 
+        PATTERN "*.*")
+
+# Create and install a launcher script for macOS
+if(APPLE)
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/launcher.command" 
+        "#!/bin/bash\ncd \"$(dirname \"$0\")\"\n./oop")
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/launcher.command" 
+            DESTINATION ${DESTINATION_DIR}
+            PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_EXECUTE WORLD_READ)
+endif()

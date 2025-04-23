@@ -202,10 +202,33 @@ jobs:
         run: |
           bash ./scripts/cmake.sh install -i artifacts -t ${{ env.BUILD_TYPE }}
 
+      - name: List artifact contents
+        run: |
+          echo "Listing artifacts directory contents:"
+          ls -la artifacts
+          if [ -d "artifacts/${{ env.BIN_DIR }}" ]; then
+            echo "Bin directory contents:"
+            ls -la artifacts/${{ env.BIN_DIR }}
+          else
+            echo "Warning: artifacts/${{ env.BIN_DIR }} directory not found"
+            echo "Checking if executable was installed to another location:"
+            find artifacts -type f -name "${{ env.EXECUTABLE_NAME }}" -o -name "${{ env.EXECUTABLE_NAME }}.exe"
+          fi
+
       - name: Move artifacts
         run: |
-          mkdir ${{ env.ZIP_NAME }}
-          mv artifacts/${{ env.BIN_DIR }}/* ${{ env.ZIP_NAME }}
+          mkdir -p ${{ env.ZIP_NAME }}
+          if [ -d "artifacts/${{ env.BIN_DIR }}" ]; then
+            mv artifacts/${{ env.BIN_DIR }}/* ${{ env.ZIP_NAME }}
+          else
+            # Fallback to find the executable
+            find artifacts -name "${{ env.EXECUTABLE_NAME }}" -o -name "${{ env.EXECUTABLE_NAME }}.exe" | xargs -I% cp % ${{ env.ZIP_NAME }}/
+            # Also look for any assets folder
+            if [ -d "artifacts/assets" ]; then
+              cp -r artifacts/assets ${{ env.ZIP_NAME }}/
+            fi
+          fi
+          echo "Final zip contents:"
           ls -la ${{ env.ZIP_NAME }}
 
       - name: Process artifacts
