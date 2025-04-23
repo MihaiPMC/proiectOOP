@@ -40,7 +40,17 @@ if(NOT PROJECT_SOURCES)
     
     file(WRITE ${DEFAULT_MAIN_CPP} "#include <SFML/Graphics.hpp>\n\nint main() {\n    sf::RenderWindow window(sf::VideoMode(800, 600), \"SFML Window\");\n    sf::CircleShape shape(100.f);\n    shape.setFillColor(sf::Color::Green);\n\n    while (window.isOpen()) {\n        sf::Event event;\n        while (window.pollEvent(event)) {\n            if (event.type == sf::Event::Closed)\n                window.close();\n        }\n\n        window.clear();\n        window.draw(shape);\n        window.display();\n    }\n\n    return 0;\n}\n")
     
-    set(PROJECT_SOURCES ${DEFAULT_MAIN_CPP})
+    set(PROJECT_SOURCES ${DEFAULT_MAIN_CPP}
+            src/Zoo.cpp
+            include/Zoo.hpp
+            src/Animal.cpp
+            include/Animal.hpp
+            src/Habitat.cpp
+            include/Habitat.hpp
+            src/Staff.cpp
+            include/Staff.hpp
+            src/Visitor.cpp
+            include/Visitor.hpp)
 endif()
 
 # Create the executable
