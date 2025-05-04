@@ -47,10 +47,11 @@ if(NOT PROJECT_SOURCES)
             include/Animal.hpp
             src/Habitat.cpp
             include/Habitat.hpp
-            src/Staff.cpp
-            include/Staff.hpp
             src/Visitor.cpp
-            include/Visitor.hpp)
+            include/Visitor.hpp
+            src/Game.cpp
+            include/Game.hpp
+    )
 endif()
 
 # Create the executable

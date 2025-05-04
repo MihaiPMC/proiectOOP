@@ -7,15 +7,13 @@
 #include "Animal.hpp"
 #include "Habitat.hpp"
 
-class Zoo
-{
+class Zoo {
 private:
-    std::string name;
-    std::vector<Habitat> habitats;
-    int visitorCount;
-    bool isOpen;
-    float budget;
-
+    std::string m_name;
+    std::vector<Habitat> m_habitats;
+    int m_visitorCount;
+    bool m_isOpen;
+    float m_budget;
 public:
     Zoo(const std::string &name, const std::vector<Habitat> &habitats, int visitor_count, bool is_open, float budget = 100000);
     ~Zoo() = default;
@@ -23,7 +21,6 @@ public:
     Zoo(Zoo &&other) noexcept;
     Zoo &operator=(const Zoo &other);
     Zoo &operator=(Zoo &&other) noexcept;
-
     [[nodiscard]] const std::string &getName() const;
     void setName(const std::string &newName);
     [[nodiscard]] const std::vector<Habitat> &getHabitats() const;
@@ -37,7 +34,6 @@ public:
     void setBudget(float newBudget);
     void feedAnimals(float foodAmountPerAnimal = 0.3f, float costPerAnimal = 10.0f);
     void updateHunger(float deltaTime);
-
     static Zoo initializeZoo();
     void createInitialHabitats();
     void addNewHabitat();
@@ -46,7 +42,6 @@ public:
     void processDayEnd(int dayNumber);
     void displayZooStatus() const;
     void runSimulation(int days);
-
     friend std::ostream &operator<<(std::ostream &os, const Zoo &zoo);
 };
 

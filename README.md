@@ -1,29 +1,7 @@
 # ZooTycoon
 
 ## Introducere
-Acesta este un proiect de tip joc, inspirat din jocul Zoo Tycoon, în care jucătorul își poate construi și gestiona propriul zoo. Proiectul este realizat în C++ și utilizează biblioteca SFML pentru grafică și interacțiune.
-
-
-### Folosiți template-ul corespunzător grupei voastre!
-
-| Laborant  | Link template                                |
-|-----------|----------------------------------------------|
-| Dragoș B  | https://github.com/Ionnier/oop-template      |
-| Tiberiu M | https://github.com/MaximTiberiu/oop-template |
-| Marius MC | https://github.com/mcmarius/oop-template     |
-
-### Important!
-
-Aveți voie cu cod generat de modele de limbaj la care nu ați contribuit semnificativ doar în folder-ul `generated`.
-Codul generat pus "ca să fie"/pe care nu îl înțelegeți se punctează doar pentru puncte bonus, doar în contextul
-în care oferă funcționalități ajutătoare și doar dacă are sens.
-
-O cerință nu se consideră îndeplinită dacă este realizată doar prin cod generat.
-
-- **Fără cod de umplutură/fără sens!**
-- **Fără copy-paste!**
-- **Fără variabile globale!**
-- **Fără atribute publice!**
+Acesta este un proiect de tip joc, inspirat din jocul Planet Zoo, în care jucătorul își poate construi și gestiona propriul zoo. Proiectul este realizat în C++ și utilizează biblioteca SFML pentru grafică și interacțiune.
 
 ### Tema 0
 
@@ -149,11 +127,3 @@ Vezi și [`scripts/cmake.sh`](scripts/cmake.sh).
 Observație: folderele `build/` și `install_dir/` sunt adăugate în fișierul `.gitignore` deoarece
 conțin fișiere generate și nu ne ajută să le versionăm.
 
-
-## Resurse
-
-- [SFML](https://github.com/SFML/SFML/tree/2.6.1) (Zlib)
-  - [OpenAL](https://openal-soft.org/) (LGPL): din cauza licenței, trebuie distribuită ca shared library
-- [Poza cu avionul](https://pixabay.com/vectors/travel-holiday-trip-flight-6913775/)
-- [Font](https://fonts.google.com/selection?selection.family=Fira+Sans)
-- adăugați trimiteri către resursele externe care v-au ajutat sau pe care le-ați folosit
