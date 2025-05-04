@@ -3,9 +3,20 @@
 #include <algorithm>
 
 Game::Game()
-    : m_windowWidth(1440), m_windowHeight(900),
-      m_gridWidth(40), m_gridHeight(25),
-      m_nameEntered(false)
+    : m_window(),
+      m_windowWidth(1440),
+      m_windowHeight(900),
+      m_font(),
+      m_zooName(),
+      m_nameEntered(false),
+      m_prompt(),
+      m_inputText(),
+      m_gridWidth(40),
+      m_gridHeight(25),
+      m_tileSize(0),
+      m_grassTexture(),
+      m_wallTexture(),
+      m_tiles()
 {
     m_window.create(sf::VideoMode(m_windowWidth, m_windowHeight), "Zoo Tycoon - Enter Zoo Name");
     if (!m_font.loadFromFile("fonts/DUSHICK.otf"))
@@ -162,3 +173,4 @@ void Game::run()
         render();
     }
 }
+
