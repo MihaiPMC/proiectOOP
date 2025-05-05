@@ -18,6 +18,7 @@ private:
     void render();
     void handleResize(unsigned int width, unsigned int height);
     void nameInput();
+    void showTutorial();
 
     sf::RenderWindow m_window;
     unsigned int m_windowWidth, m_windowHeight;

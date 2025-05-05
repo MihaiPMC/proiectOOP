@@ -32,16 +32,7 @@ public:
     void setIsOpen(bool is_open);
     [[nodiscard]] float getBudget() const;
     void setBudget(float newBudget);
-    void feedAnimals(float foodAmountPerAnimal = 0.3f, float costPerAnimal = 10.0f);
-    void updateHunger(float deltaTime);
-    static Zoo initializeZoo();
-    void createInitialHabitats();
-    void addNewHabitat();
-    void addAnimalsToExistingHabitat();
-    void handleDailyManagement();
-    void processDayEnd(int dayNumber);
-    void displayZooStatus() const;
-    void runSimulation(int days);
+
     bool buildHabitatAt(const std::string& type, int gridX, int gridY, int gridWidth, int gridHeight);
     bool canBuildAt(int gridX, int gridY, int gridWidth, int gridHeight) const;
     int findHabitatAt(int gridX, int gridY) const;

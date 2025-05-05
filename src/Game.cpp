@@ -47,11 +47,12 @@ Game::Game()
     m_prompt.setFont(m_font);
     m_prompt.setCharacterSize(30);
     m_prompt.setFillColor(sf::Color::White);
-    m_prompt.setString("Enter Zoo Name:");
+    m_prompt.setString("Hello. Welcome to Zoo Tycoon. Please enter your zoo name:");
     m_inputText.setFont(m_font);
     m_inputText.setCharacterSize(40);
     m_inputText.setFillColor(sf::Color::Yellow);
     nameInput();
+    showTutorial();
     if (m_zooName.empty())
         m_zooName = "ZooTycoon";
     m_window.setTitle(m_zooName);
@@ -198,6 +199,38 @@ void Game::nameInput()
     }
 }
 
+void Game::showTutorial()
+{
+    sf::Text tutorial;
+    tutorial.setFont(m_font);
+    tutorial.setCharacterSize(24);
+    tutorial.setFillColor(sf::Color::White);
+    tutorial.setString(
+        "Tutorial:\nClick 'Build Habitat' to construct a habitat,\nthen click 'Add Animal' to add animals.\nPress any key to continue.");
+    tutorial.setPosition(m_windowWidth / 2.f - tutorial.getLocalBounds().width / 2.f, m_windowHeight / 3.f);
+
+    bool tutorialDone = false;
+    while (m_window.isOpen() && !tutorialDone)
+    {
+        sf::Event event;
+        while (m_window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed)
+            {
+                m_window.close();
+                return;
+            }
+            else if (event.type == sf::Event::KeyPressed)
+            {
+                tutorialDone = true;
+            }
+        }
+        m_window.clear(sf::Color(50, 50, 50));
+        m_window.draw(tutorial);
+        m_window.display();
+    }
+}
+
 void Game::processEvents()
 {
     sf::Event event;
@@ -215,7 +248,17 @@ void Game::processEvents()
         else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
         {
             sf::Vector2i mousePos = sf::Mouse::getPosition(m_window);
-            if (!m_isAddingAnimal && m_addAnimalButton.getGlobalBounds().contains(mousePos.x, mousePos.y))
+            if (m_isAddingAnimal && m_addAnimalButton.getGlobalBounds().contains(mousePos.x, mousePos.y))
+            {
+                m_isAddingAnimal = false;
+                m_selectedHabitatIndex = -1;
+                m_selectedAnimalType = "";
+                m_animalOptionButtons.clear();
+                m_animalOptionTexts.clear();
+                std::cout << "Animal addition canceled." << std::endl;
+                continue;
+            }
+            else if (!m_isAddingAnimal && m_addAnimalButton.getGlobalBounds().contains(mousePos.x, mousePos.y))
             {
                 m_isAddingAnimal = true;
                 m_selectedHabitatIndex = -1;
@@ -273,10 +316,20 @@ void Game::processEvents()
                         (cellX + 3) <= (int(m_gridWidth) - 1) &&
                         (cellY + 3) <= (int(m_gridHeight) - 1))
                     {
-                        m_habitatBuildings.push_back(std::make_tuple(cellX, cellY, m_selectedHabitatType));
-                        m_animalsInHabitat.push_back({});
-                        m_selectedHabitatType = "";
-                        m_isBuildingHabitat = false;
+                        if (m_zoo.getBudget() >= 10000)
+                        {
+                            m_habitatBuildings.push_back(std::make_tuple(cellX, cellY, m_selectedHabitatType));
+                            m_animalsInHabitat.push_back({});
+
+                            m_zoo.setBudget(m_zoo.getBudget() - 10000);
+
+                            m_selectedHabitatType = "";
+                            m_isBuildingHabitat = false;
+                        }
+                        else
+                        {
+                            std::cout << "Not enough budget to build a habitat!" << std::endl;
+                        }
                     }
                     else
                     {
@@ -350,7 +403,15 @@ void Game::processEvents()
 
                             if (m_selectedHabitatIndex >= 0 && m_selectedHabitatIndex < (int) m_animalsInHabitat.size())
                             {
-                                m_animalsInHabitat[m_selectedHabitatIndex].push_back(m_selectedAnimalType);
+                                if (m_zoo.getBudget() >= 2000)
+                                {
+                                    m_animalsInHabitat[m_selectedHabitatIndex].push_back(m_selectedAnimalType);
+                                    m_zoo.setBudget(m_zoo.getBudget() - 2000);
+                                }
+                                else
+                                {
+                                    std::cout << "Not enough budget to add an animal!" << std::endl;
+                                }
                             }
 
                             m_isAddingAnimal = false;
@@ -496,6 +557,16 @@ void Game::render()
         m_buildHabitatButtonText.setString("Build Habitat");
         m_buildHabitatButton.setFillColor(sf::Color(100, 100, 200));
     }
+    if (m_isAddingAnimal)
+    {
+        m_addAnimalButtonText.setString("Cancel ");
+        m_addAnimalButton.setFillColor(sf::Color::Red);
+    }
+    else
+    {
+        m_addAnimalButtonText.setString("Add Animal");
+        m_addAnimalButton.setFillColor(sf::Color(100, 200, 100));
+    }
     m_window.draw(m_buildHabitatButton);
     m_window.draw(m_buildHabitatButtonText);
     m_window.draw(m_addAnimalButton);
@@ -512,6 +583,15 @@ void Game::render()
             m_window.draw(m_animalOptionButtons[i]);
             m_window.draw(m_animalOptionTexts[i]);
         }
+
+    sf::Text budgetText;
+    budgetText.setFont(m_font);
+    budgetText.setCharacterSize(20);
+    budgetText.setFillColor(sf::Color::White);
+    budgetText.setString("Budget: $" + std::to_string(static_cast<int>(m_zoo.getBudget())));
+    budgetText.setPosition(m_windowWidth - 200, m_gridHeight * m_tileSize + 10);
+    m_window.draw(budgetText);
+
     m_window.display();
 }
 

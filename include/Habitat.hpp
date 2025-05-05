@@ -12,10 +12,8 @@ private:
     float m_cleanlinessLevel;
     float m_price;
     static std::map<std::string, std::vector<std::string>> s_habitatSpecies;
-
     int m_gridX;
     int m_gridY;
-
 public:
     Habitat(const std::string &type, const std::vector<Animal> &animals, int capacity = 5, float cleanlinessLevel = 1.0f,
             float price = 10000.0f);
