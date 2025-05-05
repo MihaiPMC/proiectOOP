@@ -1,9 +1,7 @@
 #include "../include/Habitat.hpp"
 
-Habitat::Habitat(const std::string &type, const std::vector<Animal> &animals, int capacity, float cleanlinessLevel,
-                 float price)
-    : m_type(type), m_animals(animals), m_capacity(capacity), m_cleanlinessLevel(cleanlinessLevel), m_price(price),
-      m_gridX(-1), m_gridY(-1)
+Habitat::Habitat(const std::string &type, const std::vector<std::shared_ptr<Animal>> &animals, int capacity, float cleanlinessLevel, float price)
+    : m_type(type), m_animals(animals), m_capacity(capacity), m_cleanlinessLevel(cleanlinessLevel), m_price(price), m_gridX(-1), m_gridY(-1)
 {
 }
 
@@ -59,12 +57,12 @@ void Habitat::setType(const std::string &newType)
     m_type = newType;
 }
 
-const std::vector<Animal> &Habitat::getAnimals() const
+const std::vector<std::shared_ptr<Animal>> &Habitat::getAnimals() const
 {
     return m_animals;
 }
 
-void Habitat::addAnimals(const std::vector<Animal> &newAnimals)
+void Habitat::addAnimals(const std::vector<std::shared_ptr<Animal>> &newAnimals)
 {
     for (const auto &animal: newAnimals)
     {
@@ -72,7 +70,7 @@ void Habitat::addAnimals(const std::vector<Animal> &newAnimals)
     }
 }
 
-void Habitat::addAnimals(const Animal &animal)
+void Habitat::addAnimal(const std::shared_ptr<Animal> &animal)
 {
     m_animals.push_back(animal);
 }
@@ -127,14 +125,14 @@ void Habitat::updateCleanliness(float deltaTime)
 std::ostream &operator<<(std::ostream &os, const Habitat &habitat)
 {
     os << "Habitat: " << habitat.m_type << "\n"
-            << "  Capacity: " << habitat.m_capacity << "\n"
-            << "  Cleanliness: " << (habitat.m_cleanlinessLevel * 100) << "%" << "\n"
-            << "  Price: $" << habitat.m_price << "\n"
-            << "  Animals: " << habitat.m_animals.size();
+       << "  Capacity: " << habitat.m_capacity << "\n"
+       << "  Cleanliness: " << (habitat.m_cleanlinessLevel * 100) << "%" << "\n"
+       << "  Price: $" << habitat.m_price << "\n"
+       << "  Animals: " << habitat.m_animals.size();
     return os;
 }
 
-std::map<std::string, std::vector<std::string> > Habitat::s_habitatSpecies = {
+std::map<std::string, std::vector<std::string>> Habitat::s_habitatSpecies = {
     {"Forest", {"Bear", "Wolf", "Fox", "Deer", "Owl"}},
     {"Desert", {"Camel", "Scorpion", "Rattlesnake", "Coyote", "Lizard"}},
     {"Ocean", {"Dolphin", "Shark", "Octopus", "Penguin", "Sea Turtle"}},
@@ -142,7 +140,7 @@ std::map<std::string, std::vector<std::string> > Habitat::s_habitatSpecies = {
     {"Mountain", {"Eagle", "Mountain Lion", "Goat", "Yak", "Snow Leopard"}}
 };
 
-std::map<std::string, std::vector<std::string> > Habitat::getHabitatSpecies()
+std::map<std::string, std::vector<std::string>> Habitat::getHabitatSpecies()
 {
     return s_habitatSpecies;
 }
@@ -152,8 +150,7 @@ std::string Habitat::selectHabitatType()
     int habitatType;
     do
     {
-        std::cout << "What habitat do you want to add? 1. Forest 2. Desert 3. Ocean 4. Savanna 5. Mountain" <<
-                std::endl;
+        std::cout << "What habitat do you want to add? 1. Forest 2. Desert 3. Ocean 4. Savanna 5. Mountain" << std::endl;
         std::cin >> habitatType;
         if (habitatType < 1 || habitatType > 5)
             std::cout << "Invalid habitat type! Please choose again." << std::endl;
@@ -198,11 +195,11 @@ void Habitat::addRandomAnimals(int count, float &budget)
             std::cout << "Invalid choice. Defaulting to first species." << std::endl;
             speciesChoice = 1;
         }
-        Animal newAnimal = Animal::createRandomAnimal(species[speciesChoice - 1]);
-        addAnimals(newAnimal);
-        budget -= newAnimal.getPrice();
-        std::cout << "Added " << newAnimal.getName() << " the " << newAnimal.getSpecies()
-                << " to " << m_type << " habitat!" << std::endl;
+        auto newAnimal = Animal::createRandomAnimal(species[speciesChoice - 1]);
+        addAnimal(newAnimal);
+        budget -= newAnimal->getPrice();
+        std::cout << "Added " << newAnimal->getName() << " the " << newAnimal->getSpecies()
+                  << " to " << m_type << " habitat!" << std::endl;
         std::cout << "Remaining budget: $" << budget << std::endl;
     }
 }
@@ -225,26 +222,27 @@ int Habitat::getGridY() const
 
 bool Habitat::overlaps(const Habitat &other) const
 {
-    if (m_gridX == -1 || other.m_gridX == -1) return false;
-
-    return !(m_gridX + 3 <= other.m_gridX || other.m_gridX + 3 <= m_gridX ||
-             m_gridY + 3 <= other.m_gridY || other.m_gridY + 3 <= m_gridY);
+    if (m_gridX == -1 || other.m_gridX == -1)
+        return false;
+    return !(m_gridX + 3 <= other.m_gridX || other.m_gridX + 3 <= m_gridX || m_gridY + 3 <= other.m_gridY || other.m_gridY + 3 <= m_gridY);
 }
 
 bool Habitat::isValidPosition(int gridWidth, int gridHeight) const
 {
-    return m_gridX >= 1 && m_gridY >= 1 &&
-           (m_gridX + 3) <= (gridWidth - 1) &&
-           (m_gridY + 3) <= (gridHeight - 1);
+    return m_gridX >= 1 && m_gridY >= 1 && (m_gridX + 3) <= (gridWidth - 1) && (m_gridY + 3) <= (gridHeight - 1);
 }
 
 std::vector<std::string> Habitat::getAllowedAnimals(const std::string &habitatType)
 {
-    if (habitatType == "Forest") return {"bear", "fox", "wolf"};
-    else if (habitatType == "Desert") return {"camel", "coyote", "scorpion"};
-    else if (habitatType == "Mountain") return {"eagle", "goat", "yak"};
-    else if (habitatType == "Ocean") return {"dolphin", "octopus", "seaturtle"};
-    else if (habitatType == "Savanna") return {"elephant", "lion", "zebra"};
-
+    if (habitatType == "Forest")
+        return {"bear", "fox", "wolf"};
+    else if (habitatType == "Desert")
+        return {"camel", "coyote", "scorpion"};
+    else if (habitatType == "Mountain")
+        return {"eagle", "goat", "yak"};
+    else if (habitatType == "Ocean")
+        return {"dolphin", "octopus", "seaturtle"};
+    else if (habitatType == "Savanna")
+        return {"elephant", "lion", "zebra"};
     return {};
 }

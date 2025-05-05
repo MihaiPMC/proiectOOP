@@ -51,6 +51,12 @@ if(NOT PROJECT_SOURCES)
             include/Visitor.hpp
             src/Game.cpp
             include/Game.hpp
+            include/Bird.hpp
+            include/Mammal.hpp
+            include/Fish.hpp
+            src/Bird.cpp
+            src/Mammal.cpp
+            src/Fish.cpp
     )
 endif()
 

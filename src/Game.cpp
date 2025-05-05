@@ -331,6 +331,7 @@ void Game::processEvents()
                             std::cout << "Not enough budget to build a habitat!" << std::endl;
                         }
                     }
+
                     else
                     {
                         std::cout << "Cannot place habitat here: overlapping another habitat or out of bounds." <<
@@ -383,8 +384,10 @@ void Game::processEvents()
                                     for (char ch: type) lowerType.push_back(std::tolower(ch));
                                     std::stringstream ss;
                                     ss << "images/" << lowerType << "/" << allowed[j] << ".png";
+                                    std::string primaryPath = ss.str();
+                                    std::string backupPath = "../" + primaryPath;
                                     sf::Texture tex;
-                                    loadTexture(tex, ss.str(), ss.str(), sf::Color::Magenta);
+                                    loadTexture(tex, primaryPath, backupPath, sf::Color::Magenta);
                                     m_animalTextures[allowed[j]] = tex;
                                 }
                             }
@@ -604,3 +607,4 @@ void Game::run()
         render();
     }
 }
+

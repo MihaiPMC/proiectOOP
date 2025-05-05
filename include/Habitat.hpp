@@ -4,10 +4,12 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <memory>
+
 class Habitat {
 private:
     std::string m_type;
-    std::vector<Animal> m_animals;
+    std::vector<std::shared_ptr<Animal>> m_animals;
     int m_capacity;
     float m_cleanlinessLevel;
     float m_price;
@@ -15,8 +17,7 @@ private:
     int m_gridX;
     int m_gridY;
 public:
-    Habitat(const std::string &type, const std::vector<Animal> &animals, int capacity = 5, float cleanlinessLevel = 1.0f,
-            float price = 10000.0f);
+    Habitat(const std::string &type, const std::vector<std::shared_ptr<Animal>> &animals, int capacity = 5, float cleanlinessLevel = 1.0f, float price = 10000.0f);
     ~Habitat() = default;
     Habitat(const Habitat &other);
     Habitat(Habitat &&other) noexcept;
@@ -24,9 +25,9 @@ public:
     Habitat &operator=(Habitat &&other) noexcept;
     [[nodiscard]] const std::string &getType() const;
     void setType(const std::string &newType);
-    [[nodiscard]] const std::vector<Animal> &getAnimals() const;
-    void addAnimals(const std::vector<Animal> &newAnimals);
-    void addAnimals(const Animal &animal);
+    [[nodiscard]] const std::vector<std::shared_ptr<Animal>> &getAnimals() const;
+    void addAnimals(const std::vector<std::shared_ptr<Animal>> &newAnimals);
+    void addAnimal(const std::shared_ptr<Animal> &animal);
     [[nodiscard]] int getCapacity() const;
     void setCapacity(int newCapacity);
     [[nodiscard]] float getCleanlinessLevel() const;
@@ -44,6 +45,5 @@ public:
     bool overlaps(const Habitat& other) const;
     bool isValidPosition(int gridWidth, int gridHeight) const;
     static std::vector<std::string> getAllowedAnimals(const std::string& habitatType);
-
     friend std::ostream &operator<<(std::ostream &os, const Habitat &habitat);
 };

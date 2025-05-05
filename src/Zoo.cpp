@@ -164,8 +164,8 @@ bool Zoo::addAnimalTo(int habitatIndex, const std::string& animalType)
         return false;
     }
     
-    Animal newAnimal = Animal::createRandomAnimal(animalType);
-    m_habitats[habitatIndex].addAnimals(newAnimal);
+    auto newAnimal = Animal::createRandomAnimal(animalType);
+    m_habitats[habitatIndex].addAnimal(newAnimal);
     m_budget -= 2000;
     
     return true;

@@ -4,6 +4,8 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <memory>
+
 class Animal {
 private:
     std::string m_name;
@@ -16,8 +18,7 @@ private:
     float m_foodLevel;
     static std::vector<std::string> s_animalNames;
 public:
-    Animal(const std::string &name, const std::string &species, int age, float weight, float height,
-           float is_healthy = 1.0f, int price = 1000, float hunger = 0.0f);
+    Animal(const std::string &name, const std::string &species, int age, float weight, float height, float is_healthy = 1.0f, int price = 1000, float hunger = 0.0f);
     ~Animal() = default;
     Animal(const Animal &other);
     Animal(Animal &&other) noexcept;
@@ -43,7 +44,9 @@ public:
     void updateHunger(float deltaTime);
     friend std::ostream &operator<<(std::ostream &os, const Animal &animal);
     static std::string getRandomName();
-    static Animal createRandomAnimal(const std::string& species, int minAge = 1, int maxAge = 10);
+    virtual void performBehavior() const = 0;
+    virtual std::shared_ptr<Animal> clone() const = 0;
+    static std::shared_ptr<Animal> createRandomAnimal(const std::string& species, int minAge = 1, int maxAge = 10);
 };
 
 #endif //ANIMAL_H
