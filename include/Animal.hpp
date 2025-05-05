@@ -19,7 +19,7 @@ private:
     static std::vector<std::string> s_animalNames;
 public:
     Animal(const std::string &name, const std::string &species, int age, float weight, float height, float is_healthy = 1.0f, int price = 1000, float hunger = 0.0f);
-    ~Animal() = default;
+    virtual ~Animal() = default;
     Animal(const Animal &other);
     Animal(Animal &&other) noexcept;
     Animal &operator=(const Animal &other);
