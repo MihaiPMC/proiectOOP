@@ -12,6 +12,10 @@ private:
     float m_cleanlinessLevel;
     float m_price;
     static std::map<std::string, std::vector<std::string>> s_habitatSpecies;
+
+    int m_gridX;
+    int m_gridY;
+
 public:
     Habitat(const std::string &type, const std::vector<Animal> &animals, int capacity = 5, float cleanlinessLevel = 1.0f,
             float price = 10000.0f);
@@ -36,5 +40,12 @@ public:
     static std::map<std::string, std::vector<std::string>> getHabitatSpecies();
     static std::string selectHabitatType();
     void addRandomAnimals(int count, float &budget);
+    void setPosition(int x, int y);
+    int getGridX() const;
+    int getGridY() const;
+    bool overlaps(const Habitat& other) const;
+    bool isValidPosition(int gridWidth, int gridHeight) const;
+    static std::vector<std::string> getAllowedAnimals(const std::string& habitatType);
+
     friend std::ostream &operator<<(std::ostream &os, const Habitat &habitat);
 };

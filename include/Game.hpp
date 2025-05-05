@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include "Zoo.hpp"
 
 class Game
 {
@@ -42,10 +43,11 @@ private:
     sf::Text m_addAnimalButtonText;
     bool m_isAddingAnimal;
     bool m_showAnimalOptionsForAnimal;
-    int m_selectedHabitatIndex;
+    int m_selectedHabitatIndex; 
     std::string m_selectedAnimalType;
     std::vector<sf::RectangleShape> m_animalOptionButtons;
     std::vector<sf::Text> m_animalOptionTexts;
     std::map<std::string, sf::Texture> m_animalTextures;
     std::vector<std::vector<std::string>> m_animalsInHabitat;
+    Zoo m_zoo;
 };

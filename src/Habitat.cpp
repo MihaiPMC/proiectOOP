@@ -2,19 +2,22 @@
 
 Habitat::Habitat(const std::string &type, const std::vector<Animal> &animals, int capacity, float cleanlinessLevel,
                  float price)
-    : m_type(type), m_animals(animals), m_capacity(capacity), m_cleanlinessLevel(cleanlinessLevel), m_price(price)
+    : m_type(type), m_animals(animals), m_capacity(capacity), m_cleanlinessLevel(cleanlinessLevel), m_price(price),
+      m_gridX(-1), m_gridY(-1)
 {
 }
 
 Habitat::Habitat(const Habitat &other)
     : m_type(other.m_type), m_animals(other.m_animals), m_capacity(other.m_capacity),
-      m_cleanlinessLevel(other.m_cleanlinessLevel), m_price(other.m_price)
+      m_cleanlinessLevel(other.m_cleanlinessLevel), m_price(other.m_price),
+      m_gridX(other.m_gridX), m_gridY(other.m_gridY)
 {
 }
 
 Habitat::Habitat(Habitat &&other) noexcept
     : m_type(std::move(other.m_type)), m_animals(std::move(other.m_animals)),
-      m_capacity(other.m_capacity), m_cleanlinessLevel(other.m_cleanlinessLevel), m_price(other.m_price)
+      m_capacity(other.m_capacity), m_cleanlinessLevel(other.m_cleanlinessLevel), m_price(other.m_price),
+      m_gridX(other.m_gridX), m_gridY(other.m_gridY)
 {
 }
 
@@ -27,6 +30,8 @@ Habitat &Habitat::operator=(const Habitat &other)
     m_capacity = other.m_capacity;
     m_cleanlinessLevel = other.m_cleanlinessLevel;
     m_price = other.m_price;
+    m_gridX = other.m_gridX;
+    m_gridY = other.m_gridY;
     return *this;
 }
 
@@ -39,6 +44,8 @@ Habitat &Habitat::operator=(Habitat &&other) noexcept
     m_capacity = other.m_capacity;
     m_cleanlinessLevel = other.m_cleanlinessLevel;
     m_price = other.m_price;
+    m_gridX = other.m_gridX;
+    m_gridY = other.m_gridY;
     return *this;
 }
 
@@ -198,4 +205,46 @@ void Habitat::addRandomAnimals(int count, float &budget)
                 << " to " << m_type << " habitat!" << std::endl;
         std::cout << "Remaining budget: $" << budget << std::endl;
     }
+}
+
+void Habitat::setPosition(int x, int y)
+{
+    m_gridX = x;
+    m_gridY = y;
+}
+
+int Habitat::getGridX() const
+{
+    return m_gridX;
+}
+
+int Habitat::getGridY() const
+{
+    return m_gridY;
+}
+
+bool Habitat::overlaps(const Habitat &other) const
+{
+    if (m_gridX == -1 || other.m_gridX == -1) return false;
+
+    return !(m_gridX + 3 <= other.m_gridX || other.m_gridX + 3 <= m_gridX ||
+             m_gridY + 3 <= other.m_gridY || other.m_gridY + 3 <= m_gridY);
+}
+
+bool Habitat::isValidPosition(int gridWidth, int gridHeight) const
+{
+    return m_gridX >= 1 && m_gridY >= 1 &&
+           (m_gridX + 3) <= (gridWidth - 1) &&
+           (m_gridY + 3) <= (gridHeight - 1);
+}
+
+std::vector<std::string> Habitat::getAllowedAnimals(const std::string &habitatType)
+{
+    if (habitatType == "Forest") return {"bear", "fox", "wolf"};
+    else if (habitatType == "Desert") return {"camel", "coyote", "scorpion"};
+    else if (habitatType == "Mountain") return {"eagle", "goat", "yak"};
+    else if (habitatType == "Ocean") return {"dolphin", "octopus", "seaturtle"};
+    else if (habitatType == "Savanna") return {"elephant", "lion", "zebra"};
+
+    return {};
 }

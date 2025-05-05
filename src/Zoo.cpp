@@ -327,3 +327,58 @@ void Zoo::runSimulation(int days)
     }
     std::cout << "Simulation is over" << std::endl;
 }
+
+bool Zoo::buildHabitatAt(const std::string& type, int gridX, int gridY, int gridWidth, int gridHeight) {
+    if (!canBuildAt(gridX, gridY, gridWidth, gridHeight)) {
+        return false;
+    }
+    
+    Habitat newHabitat(type, {});
+    newHabitat.setPosition(gridX, gridY);
+    addHabitats(newHabitat);
+    return true;
+}
+
+bool Zoo::canBuildAt(int gridX, int gridY, int gridWidth, int gridHeight) const {
+    Habitat temp("", {});
+    temp.setPosition(gridX, gridY);
+    
+    if (!temp.isValidPosition(gridWidth, gridHeight)) {
+        return false;
+    }
+    
+    for (const auto& habitat : m_habitats) {
+        if (temp.overlaps(habitat)) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+int Zoo::findHabitatAt(int gridX, int gridY) const {
+    for (size_t i = 0; i < m_habitats.size(); i++) {
+        const Habitat& habitat = m_habitats[i];
+        int hx = habitat.getGridX();
+        int hy = habitat.getGridY();
+        
+        if (gridX >= hx && gridX < hx + 3 &&
+            gridY >= hy && gridY < hy + 3) {
+            return static_cast<int>(i);
+        }
+    }
+    return -1;
+}
+
+bool Zoo::addAnimalTo(int habitatIndex, const std::string& animalType) {
+    if (habitatIndex < 0 || habitatIndex >= static_cast<int>(m_habitats.size())) {
+        return false;
+    }
+    
+    Animal newAnimal = Animal::createRandomAnimal(animalType);
+    
+    auto& habitats = const_cast<std::vector<Habitat>&>(getHabitats());
+    habitats[habitatIndex].addAnimals(newAnimal);
+    
+    return true;
+}

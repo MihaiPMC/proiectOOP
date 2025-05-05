@@ -42,6 +42,10 @@ public:
     void processDayEnd(int dayNumber);
     void displayZooStatus() const;
     void runSimulation(int days);
+    bool buildHabitatAt(const std::string& type, int gridX, int gridY, int gridWidth, int gridHeight);
+    bool canBuildAt(int gridX, int gridY, int gridWidth, int gridHeight) const;
+    int findHabitatAt(int gridX, int gridY) const;
+    bool addAnimalTo(int habitatIndex, const std::string& animalType);
     friend std::ostream &operator<<(std::ostream &os, const Zoo &zoo);
 };
 
