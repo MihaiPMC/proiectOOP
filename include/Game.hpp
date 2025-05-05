@@ -38,4 +38,14 @@ private:
     std::vector<sf::RectangleShape> m_habitatOptionButtons;
     std::vector<sf::Text> m_habitatOptionTexts;
     std::vector<std::tuple<int, int, std::string>> m_habitatBuildings;
+    sf::RectangleShape m_addAnimalButton;
+    sf::Text m_addAnimalButtonText;
+    bool m_isAddingAnimal;
+    bool m_showAnimalOptionsForAnimal;
+    int m_selectedHabitatIndex;
+    std::string m_selectedAnimalType;
+    std::vector<sf::RectangleShape> m_animalOptionButtons;
+    std::vector<sf::Text> m_animalOptionTexts;
+    std::map<std::string, sf::Texture> m_animalTextures;
+    std::vector<std::vector<std::string>> m_animalsInHabitat;
 };
