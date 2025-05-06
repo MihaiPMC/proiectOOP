@@ -86,7 +86,7 @@ bool caseInsensitiveCompare(const std::string& str1, const std::string& str2) {
 
 void Habitat::addAnimal(const std::shared_ptr<Animal> &animal)
 {
-    if (m_animals.size() >= m_capacity) {
+    if (static_cast<int>(m_animals.size()) >= m_capacity) {
         throw HabitatException("Habitat has reached its capacity of " + std::to_string(m_capacity) + " animals");
     }
 

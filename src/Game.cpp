@@ -39,9 +39,9 @@ Game::Game()
       m_showAnimalOptionsForAnimal(false),
       m_selectedHabitatIndex(-1),
       m_selectedAnimalType(""),
+      m_statusMessage(),
       m_animalOptionButtons(),
       m_animalOptionTexts(),
-      m_statusMessage(),
       m_animalTextures(),
       m_animalsInHabitat(),
       m_zoo("Default Zoo", {}, 0, true)
