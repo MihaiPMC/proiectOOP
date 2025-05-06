@@ -19,6 +19,7 @@ private:
     void handleResize(unsigned int width, unsigned int height);
     void nameInput();
     void showTutorial();
+    void syncZooDataForRendering(); // Metodă nouă pentru sincronizare
 
     sf::RenderWindow m_window;
     unsigned int m_windowWidth, m_windowHeight;

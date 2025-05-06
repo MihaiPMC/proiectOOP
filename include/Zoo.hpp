@@ -32,7 +32,7 @@ public:
     void setIsOpen(bool is_open);
     [[nodiscard]] float getBudget() const;
     void setBudget(float newBudget);
-
+    bool spendMoney(float amount);
     bool buildHabitatAt(const std::string& type, int gridX, int gridY, int gridWidth, int gridHeight);
     bool canBuildAt(int gridX, int gridY, int gridWidth, int gridHeight) const;
     int findHabitatAt(int gridX, int gridY) const;

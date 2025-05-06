@@ -67,7 +67,7 @@ void Zoo::addHabitats(const std::vector<Habitat> &newHabitats)
 void Zoo::addHabitats(const Habitat &habitat)
 {
     m_habitats.push_back(habitat);
-    m_budget -= habitat.getPrice();
+    spendMoney(habitat.getPrice());
 }
 
 int Zoo::getVisitorCount() const
@@ -110,6 +110,32 @@ std::ostream &operator<<(std::ostream &os, const Zoo &zoo)
     return os;
 }
 
+bool Zoo::spendMoney(float amount)
+{
+    if (m_budget >= amount) {
+        m_budget -= amount;
+        return true;
+    }
+    return false;
+}
+
+bool Zoo::canBuildAt(int gridX, int gridY, int gridWidth, int gridHeight) const
+{
+    if (gridX <= 0 || gridY <= 0 || (gridX + 3) >= (gridWidth - 1) || (gridY + 3) >= (gridHeight - 1)) {
+        return false;
+    }
+
+    for (const auto &habitat : m_habitats) {
+        if (habitat.getGridX() != -1) {
+            if (!(gridX + 3 <= habitat.getGridX() || habitat.getGridX() + 3 <= gridX ||
+                  gridY + 3 <= habitat.getGridY() || habitat.getGridY() + 3 <= gridY)) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
 
 bool Zoo::buildHabitatAt(const std::string& type, int gridX, int gridY, int gridWidth, int gridHeight) {
     if (!canBuildAt(gridX, gridY, gridWidth, gridHeight)) {
@@ -117,25 +143,17 @@ bool Zoo::buildHabitatAt(const std::string& type, int gridX, int gridY, int grid
     }
     
     Habitat newHabitat(type, {});
-    newHabitat.setPosition(gridX, gridY);
-    addHabitats(newHabitat);
-    return true;
-}
+    float habitatPrice = newHabitat.getPrice();
 
-bool Zoo::canBuildAt(int gridX, int gridY, int gridWidth, int gridHeight) const {
-    Habitat temp("", {});
-    temp.setPosition(gridX, gridY);
-    
-    if (!temp.isValidPosition(gridWidth, gridHeight)) {
+    if (!spendMoney(habitatPrice)) {
+        std::cout << "Not enough budget to build a habitat!" << std::endl;
         return false;
     }
     
-    for (const auto& habitat : m_habitats) {
-        if (temp.overlaps(habitat)) {
-            return false;
-        }
-    }
+    newHabitat.setPosition(gridX, gridY);
+    m_habitats.push_back(newHabitat);
     
+    std::cout << "Habitat " << type << " built successfully at position (" << gridX << "," << gridY << ")" << std::endl;
     return true;
 }
 
@@ -159,15 +177,17 @@ bool Zoo::addAnimalTo(int habitatIndex, const std::string& animalType)
         return false;
     }
     
-    if (m_budget < 2000) {
+    auto newAnimal = Animal::createRandomAnimal(animalType);
+    float animalPrice = newAnimal->getPrice();
+
+    if (!spendMoney(animalPrice)) {
         std::cout << "Not enough budget to add an animal!" << std::endl;
         return false;
     }
     
-    auto newAnimal = Animal::createRandomAnimal(animalType);
     m_habitats[habitatIndex].addAnimal(newAnimal);
-    m_budget -= 2000;
-    
+
+    std::cout << "Added " << newAnimal->getName() << " the " << animalType
+              << " to " << m_habitats[habitatIndex].getType() << " habitat!" << std::endl;
     return true;
 }
-

@@ -297,45 +297,16 @@ void Game::processEvents()
                     int cellX = mousePos.x / m_tileSize;
                     int cellY = mousePos.y / m_tileSize;
 
-                    bool canPlace = true;
-                    for (auto &b: m_habitatBuildings)
+                    if (m_zoo.buildHabitatAt(m_selectedHabitatType, cellX, cellY, m_gridWidth, m_gridHeight))
                     {
-                        int bx, by;
-                        std::string type;
-                        std::tie(bx, by, type) = b;
-
-                        if (!(cellX + 3 <= bx || bx + 3 <= cellX ||
-                              cellY + 3 <= by || by + 3 <= cellY))
-                        {
-                            canPlace = false;
-                            break;
-                        }
+                        m_habitatBuildings.push_back(std::make_tuple(cellX, cellY, m_selectedHabitatType));
+                        m_animalsInHabitat.push_back({});
+                        m_selectedHabitatType = "";
+                        m_isBuildingHabitat = false;
                     }
-
-                    if (canPlace && cellX >= 1 && cellY >= 1 &&
-                        (cellX + 3) <= (int(m_gridWidth) - 1) &&
-                        (cellY + 3) <= (int(m_gridHeight) - 1))
-                    {
-                        if (m_zoo.getBudget() >= 10000)
-                        {
-                            m_habitatBuildings.push_back(std::make_tuple(cellX, cellY, m_selectedHabitatType));
-                            m_animalsInHabitat.push_back({});
-
-                            m_zoo.setBudget(m_zoo.getBudget() - 10000);
-
-                            m_selectedHabitatType = "";
-                            m_isBuildingHabitat = false;
-                        }
-                        else
-                        {
-                            std::cout << "Not enough budget to build a habitat!" << std::endl;
-                        }
-                    }
-
                     else
                     {
-                        std::cout << "Cannot place habitat here: overlapping another habitat or out of bounds." <<
-                                std::endl;
+                        std::cout << "Cannot place habitat here: overlapping or out of bounds." << std::endl;
                     }
                 }
             }
@@ -404,17 +375,9 @@ void Game::processEvents()
                         {
                             m_selectedAnimalType = m_animalOptionTexts[i].getString();
 
-                            if (m_selectedHabitatIndex >= 0 && m_selectedHabitatIndex < (int) m_animalsInHabitat.size())
+                            if (m_zoo.addAnimalTo(m_selectedHabitatIndex, m_selectedAnimalType))
                             {
-                                if (m_zoo.getBudget() >= 2000)
-                                {
-                                    m_animalsInHabitat[m_selectedHabitatIndex].push_back(m_selectedAnimalType);
-                                    m_zoo.setBudget(m_zoo.getBudget() - 2000);
-                                }
-                                else
-                                {
-                                    std::cout << "Not enough budget to add an animal!" << std::endl;
-                                }
+                                m_animalsInHabitat[m_selectedHabitatIndex].push_back(m_selectedAnimalType);
                             }
 
                             m_isAddingAnimal = false;
@@ -534,7 +497,7 @@ void Game::render()
                 sf::Sprite animalSprite;
                 animalSprite.setTexture(m_animalTextures[animal]);
                 sf::Vector2u texSize = m_animalTextures[animal].getSize();
-                float factor = 0.03f; // much smaller animal icon
+                float factor = 0.03f;
                 animalSprite.setScale(factor, factor);
                 int scaledWidth = int(texSize.x * factor);
                 int scaledHeight = int(texSize.y * factor);
