@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <memory>
+#include "ZooExceptions.hpp"
 
 class Habitat {
 private:

@@ -57,6 +57,14 @@ if(NOT PROJECT_SOURCES)
             src/Bird.cpp
             src/Mammal.cpp
             src/Fish.cpp
+            src/AnimalException.cpp
+            include/AnimalException.hpp
+            src/BudgetException.cpp
+            include/BudgetException.hpp
+            src/ZooExceptions.cpp
+            include/ZooExceptions.hpp
+            src/HabitatException.cpp
+            include/HabitatException.hpp
     )
 endif()
 

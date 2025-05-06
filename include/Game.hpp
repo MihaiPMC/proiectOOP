@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include "Zoo.hpp"
+#include "ZooExceptions.hpp"
 
 class Game
 {
@@ -19,7 +20,7 @@ private:
     void handleResize(unsigned int width, unsigned int height);
     void nameInput();
     void showTutorial();
-    void syncZooDataForRendering(); // Metodă nouă pentru sincronizare
+    void syncZooDataForRendering();
 
     sf::RenderWindow m_window;
     unsigned int m_windowWidth, m_windowHeight;
@@ -45,6 +46,7 @@ private:
     sf::Text m_addAnimalButtonText;
     bool m_isAddingAnimal;
     bool m_showAnimalOptionsForAnimal;
+    sf::Text m_statusMessage;
     int m_selectedHabitatIndex; 
     std::string m_selectedAnimalType;
     std::vector<sf::RectangleShape> m_animalOptionButtons;

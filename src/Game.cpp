@@ -1,4 +1,8 @@
 #include "../include/Game.hpp"
+#include "../include/ZooExceptions.hpp"
+#include "../include/BudgetException.hpp"
+#include "../include/HabitatException.hpp"
+#include "../include/AnimalException.hpp"
 #include <iostream>
 #include <algorithm>
 #include <cctype>
@@ -37,6 +41,7 @@ Game::Game()
       m_selectedAnimalType(""),
       m_animalOptionButtons(),
       m_animalOptionTexts(),
+      m_statusMessage(),
       m_animalTextures(),
       m_animalsInHabitat(),
       m_zoo("Default Zoo", {}, 0, true)
@@ -109,6 +114,10 @@ Game::Game()
     m_addAnimalButtonText.setFillColor(sf::Color::White);
     m_addAnimalButtonText.setString("Add Animal");
     m_addAnimalButtonText.setPosition(m_addAnimalButton.getPosition().x + 10, m_addAnimalButton.getPosition().y + 5);
+    
+    m_statusMessage.setFont(m_font);
+    m_statusMessage.setCharacterSize(16);
+    m_statusMessage.setFillColor(sf::Color::Yellow);
     std::vector<std::string> options = {"Desert", "Forest", "Mountain", "Ocean", "Savanna"};
     float btnWidth = 120, btnHeight = 40;
     float startX = m_buildHabitatButton.getPosition().x + m_buildHabitatButton.getSize().x + 10;
@@ -273,14 +282,23 @@ void Game::processEvents()
             }
             else if (m_showHabitatOptions)
             {
-                for (size_t i = 0; i < m_habitatOptionButtons.size(); i++)
+                if (m_buildHabitatButton.getGlobalBounds().contains(mousePos.x, mousePos.y))
                 {
-                    if (m_habitatOptionButtons[i].getGlobalBounds().contains(mousePos.x, mousePos.y))
+                    m_showHabitatOptions = false;
+                    std::cout << "Habitat selection cancelled." << std::endl;
+                }
+                else
+                {
+                    for (size_t i = 0; i < m_habitatOptionButtons.size(); i++)
                     {
-                        m_selectedHabitatType = m_habitatOptionTexts[i].getString();
-                        m_isBuildingHabitat = true;
-                        m_showHabitatOptions = false;
-                        break;
+                        if (m_habitatOptionButtons[i].getGlobalBounds().contains(mousePos.x, mousePos.y))
+                        {
+                            m_selectedHabitatType = m_habitatOptionTexts[i].getString();
+                            m_isBuildingHabitat = true;
+                            m_showHabitatOptions = false;
+                            std::cout << "Selected habitat type: " << m_selectedHabitatType << std::endl;
+                            break;
+                        }
                     }
                 }
             }
@@ -296,17 +314,27 @@ void Game::processEvents()
                 {
                     int cellX = mousePos.x / m_tileSize;
                     int cellY = mousePos.y / m_tileSize;
-
-                    if (m_zoo.buildHabitatAt(m_selectedHabitatType, cellX, cellY, m_gridWidth, m_gridHeight))
-                    {
-                        m_habitatBuildings.push_back(std::make_tuple(cellX, cellY, m_selectedHabitatType));
-                        m_animalsInHabitat.push_back({});
-                        m_selectedHabitatType = "";
-                        m_isBuildingHabitat = false;
+            
+                    try {
+                        if (m_zoo.buildHabitatAt(m_selectedHabitatType, cellX, cellY, m_gridWidth, m_gridHeight))
+                        {
+                            std::string builtType = m_selectedHabitatType;
+                            m_habitatBuildings.push_back(std::make_tuple(cellX, cellY, m_selectedHabitatType));
+                            m_animalsInHabitat.push_back({});
+                            m_selectedHabitatType = "";
+                            m_isBuildingHabitat = false;
+                            std::cout << "Successfully built " << builtType << " habitat at position (" 
+                                      << cellX << "," << cellY << ")" << std::endl;
+                        }
                     }
-                    else
-                    {
-                        std::cout << "Cannot place habitat here: overlapping or out of bounds." << std::endl;
+                    catch (const HabitatException& e) {
+                        std::cout << e.what() << std::endl;
+                    }
+                    catch (const BudgetException& e) {
+                        std::cout << e.what() << std::endl;
+                    }
+                    catch (const std::exception& e) {
+                        std::cout << "Error: " << e.what() << std::endl;
                     }
                 }
             }
@@ -314,57 +342,61 @@ void Game::processEvents()
             {
                 if (m_selectedHabitatIndex == -1)
                 {
-                    for (size_t i = 0; i < m_habitatBuildings.size(); i++)
+                    int gridX = mousePos.x / m_tileSize;
+                    int gridY = mousePos.y / m_tileSize;
+                    
+                    int habitatIndex = m_zoo.findHabitatAt(gridX, gridY);
+                    
+                    if (habitatIndex != -1)
                     {
-                        int bx, by;
+                        m_selectedHabitatIndex = habitatIndex;
+                        
                         std::string type;
-                        std::tie(bx, by, type) = m_habitatBuildings[i];
-                        sf::IntRect habitatRect(bx * m_tileSize, by * m_tileSize, 3 * m_tileSize, 3 * m_tileSize);
-                        if (habitatRect.contains(mousePos.x, mousePos.y))
-                        {
-                            m_selectedHabitatIndex = i;
-
-                            std::vector<std::string> allowed = Habitat::getAllowedAnimals(type);
-
-                            m_animalOptionButtons.clear();
-                            m_animalOptionTexts.clear();
-
-                            float optWidth = 120, optHeight = 40;
-                            float optStartX = m_addAnimalButton.getPosition().x + m_addAnimalButton.getSize().x + 10;
-                            float optStartY = m_addAnimalButton.getPosition().y;
-
-                            for (size_t j = 0; j < allowed.size(); j++)
-                            {
-                                sf::RectangleShape btn;
-                                btn.setSize(sf::Vector2f(optWidth, optHeight));
-                                btn.setFillColor(sf::Color(200, 200, 100));
-                                btn.setPosition(optStartX + j * (optWidth + 10), optStartY);
-                                m_animalOptionButtons.push_back(btn);
-
-                                sf::Text txt;
-                                txt.setFont(m_font);
-                                txt.setCharacterSize(18);
-                                txt.setFillColor(sf::Color::Black);
-                                txt.setString(allowed[j]);
-                                txt.setPosition(btn.getPosition().x + 10, btn.getPosition().y + 5);
-                                m_animalOptionTexts.push_back(txt);
-
-                                if (m_animalTextures.find(allowed[j]) == m_animalTextures.end())
-                                {
-                                    std::string lowerType;
-                                    for (char ch: type) lowerType.push_back(std::tolower(ch));
-                                    std::stringstream ss;
-                                    ss << "images/" << lowerType << "/" << allowed[j] << ".png";
-                                    std::string primaryPath = ss.str();
-                                    std::string backupPath = "../" + primaryPath;
-                                    sf::Texture tex;
-                                    loadTexture(tex, primaryPath, backupPath, sf::Color::Magenta);
-                                    m_animalTextures[allowed[j]] = tex;
-                                }
-                            }
-                            m_showAnimalOptionsForAnimal = true;
-                            break;
+                        if (habitatIndex < static_cast<int>(m_habitatBuildings.size())) {
+                            std::tie(std::ignore, std::ignore, type) = m_habitatBuildings[habitatIndex];
+                        } else {
+                            type = m_zoo.getHabitats()[habitatIndex].getType();
                         }
+                        
+                        std::vector<std::string> allowed = Habitat::getAllowedAnimals(type);
+            
+                        m_animalOptionButtons.clear();
+                        m_animalOptionTexts.clear();
+            
+                        float optWidth = 120, optHeight = 40;
+                        float optStartX = m_addAnimalButton.getPosition().x + m_addAnimalButton.getSize().x + 10;
+                        float optStartY = m_addAnimalButton.getPosition().y;
+            
+                        for (size_t j = 0; j < allowed.size(); j++)
+                        {
+                            sf::RectangleShape btn;
+                            btn.setSize(sf::Vector2f(optWidth, optHeight));
+                            btn.setFillColor(sf::Color(200, 200, 100));
+                            btn.setPosition(optStartX + j * (optWidth + 10), optStartY);
+                            m_animalOptionButtons.push_back(btn);
+            
+                            sf::Text txt;
+                            txt.setFont(m_font);
+                            txt.setCharacterSize(18);
+                            txt.setFillColor(sf::Color::Black);
+                            txt.setString(allowed[j]);
+                            txt.setPosition(btn.getPosition().x + 10, btn.getPosition().y + 5);
+                            m_animalOptionTexts.push_back(txt);
+            
+                            if (m_animalTextures.find(allowed[j]) == m_animalTextures.end())
+                            {
+                                std::string lowerType;
+                                for (char ch: type) lowerType.push_back(std::tolower(ch));
+                                std::stringstream ss;
+                                ss << "images/" << lowerType << "/" << allowed[j] << ".png";
+                                std::string primaryPath = ss.str();
+                                std::string backupPath = "../" + primaryPath;
+                                sf::Texture tex;
+                                loadTexture(tex, primaryPath, backupPath, sf::Color::Magenta);
+                                m_animalTextures[allowed[j]] = tex;
+                            }
+                        }
+                        m_showAnimalOptionsForAnimal = true;
                     }
                 }
                 else if (m_showAnimalOptionsForAnimal)
@@ -375,9 +407,23 @@ void Game::processEvents()
                         {
                             m_selectedAnimalType = m_animalOptionTexts[i].getString();
 
-                            if (m_zoo.addAnimalTo(m_selectedHabitatIndex, m_selectedAnimalType))
-                            {
-                                m_animalsInHabitat[m_selectedHabitatIndex].push_back(m_selectedAnimalType);
+                            try {
+                                if (m_zoo.addAnimalTo(m_selectedHabitatIndex, m_selectedAnimalType))
+                                {
+                                    m_animalsInHabitat[m_selectedHabitatIndex].push_back(m_selectedAnimalType);
+                                }
+                            }
+                            catch (const HabitatException& e) {
+                                std::cout << e.what() << std::endl;
+                            }
+                            catch (const AnimalException& e) {
+                                std::cout << e.what() << std::endl;
+                            }
+                            catch (const BudgetException& e) {
+                                std::cout << e.what() << std::endl;
+                            }
+                            catch (const std::exception& e) {
+                                std::cout << "Error: " << e.what() << std::endl;
                             }
 
                             m_isAddingAnimal = false;
@@ -449,6 +495,24 @@ void Game::handleResize(unsigned int width, unsigned int height)
 
 void Game::update()
 {
+    /*
+    if (m_isBuildingHabitat) {
+        sf::Vector2i mousePos = sf::Mouse::getPosition(m_window);
+        int cellX = mousePos.x / m_tileSize;
+        int cellY = mousePos.y / m_tileSize;
+        
+        m_statusMessage.setString("Building: " + m_selectedHabitatType + 
+                                 " | Grid position: (" + std::to_string(cellX) + 
+                                 "," + std::to_string(cellY) + ")");
+        m_statusMessage.setPosition(10, m_windowHeight - 30);
+    }
+    else {
+        m_statusMessage.setString("");
+    }
+    */
+    
+    // Clear status message regardless of mode
+    m_statusMessage.setString("");
 }
 
 void Game::render()
@@ -459,6 +523,33 @@ void Game::render()
         for (unsigned int x = 0; x < m_gridWidth; x++)
         {
             m_window.draw(m_tiles[y][x]);
+
+            if (m_isBuildingHabitat) {
+                if (x >= 1 && y >= 1 && x + 2 < m_gridWidth - 1 && y + 2 < m_gridHeight - 1) {
+                    bool isValid = true;
+
+                    for (const auto& habitat : m_habitatBuildings) {
+                        int hx = std::get<0>(habitat);
+                        int hy = std::get<1>(habitat);
+
+                        bool overlapsX = (static_cast<int>(x) < hx + 3) && (static_cast<int>(x) + 3 > hx);
+                        bool overlapsY = (static_cast<int>(y) < hy + 3) && (static_cast<int>(y) + 3 > hy);
+                        
+                        if (overlapsX && overlapsY) {
+                            isValid = false;
+                            break;
+                        }
+                    }
+                    
+                    if (isValid) {
+                        sf::RectangleShape highlight;
+                        highlight.setSize(sf::Vector2f(m_tileSize, m_tileSize));
+                        highlight.setPosition(x * m_tileSize, y * m_tileSize);
+                        highlight.setFillColor(sf::Color(0, 255, 0, 40));
+                        m_window.draw(highlight);
+                    }
+                }
+            }
         }
     }
 
@@ -517,6 +608,20 @@ void Game::render()
     {
         m_buildHabitatButtonText.setString("Cancel Habitat");
         m_buildHabitatButton.setFillColor(sf::Color::Red);
+        
+        sf::Text statusText;
+        statusText.setFont(m_font);
+        statusText.setCharacterSize(16);
+        statusText.setFillColor(sf::Color::Yellow);
+        statusText.setString("Click to place " + m_selectedHabitatType + " habitat (or click Cancel)");
+        statusText.setPosition(m_buildHabitatButton.getPosition().x + m_buildHabitatButton.getSize().x + 20, 
+                              m_buildHabitatButton.getPosition().y + 10);
+        m_window.draw(statusText);
+    }
+    else if (m_showHabitatOptions)
+    {
+        m_buildHabitatButtonText.setString("Cancel");
+        m_buildHabitatButton.setFillColor(sf::Color::Red);
     }
     else
     {
@@ -558,6 +663,10 @@ void Game::render()
     budgetText.setPosition(m_windowWidth - 200, m_gridHeight * m_tileSize + 10);
     m_window.draw(budgetText);
 
+    if (!m_statusMessage.getString().isEmpty()) {
+        m_window.draw(m_statusMessage);
+    }
+    
     m_window.display();
 }
 

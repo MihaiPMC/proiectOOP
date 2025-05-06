@@ -1,4 +1,6 @@
 #include "../include/Habitat.hpp"
+#include "../include/HabitatException.hpp"
+#include "../include/AnimalException.hpp"
 
 Habitat::Habitat(const std::string &type, const std::vector<std::shared_ptr<Animal>> &animals, int capacity, float cleanlinessLevel, float price)
     : m_type(type), m_animals(animals), m_capacity(capacity), m_cleanlinessLevel(cleanlinessLevel), m_price(price), m_gridX(-1), m_gridY(-1)
@@ -70,8 +72,37 @@ void Habitat::addAnimals(const std::vector<std::shared_ptr<Animal>> &newAnimals)
     }
 }
 
+bool caseInsensitiveCompare(const std::string& str1, const std::string& str2) {
+    if (str1.size() != str2.size()) {
+        return false;
+    }
+    for (size_t i = 0; i < str1.size(); i++) {
+        if (std::tolower(str1[i]) != std::tolower(str2[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+
 void Habitat::addAnimal(const std::shared_ptr<Animal> &animal)
 {
+    if (m_animals.size() >= m_capacity) {
+        throw HabitatException("Habitat has reached its capacity of " + std::to_string(m_capacity) + " animals");
+    }
+
+    bool allowed = false;
+    const auto& compatibleSpecies = s_habitatSpecies[m_type];
+    for (const auto& species : compatibleSpecies) {
+        if (caseInsensitiveCompare(animal->getSpecies(), species)) {
+            allowed = true;
+            break;
+        }
+    }
+    
+    if (!allowed) {
+        throw AnimalException(animal->getSpecies() + " cannot live in a " + m_type + " habitat");
+    }
+    
     m_animals.push_back(animal);
 }
 
@@ -133,11 +164,11 @@ std::ostream &operator<<(std::ostream &os, const Habitat &habitat)
 }
 
 std::map<std::string, std::vector<std::string>> Habitat::s_habitatSpecies = {
-    {"Forest", {"Bear", "Wolf", "Fox", "Deer", "Owl"}},
-    {"Desert", {"Camel", "Scorpion", "Rattlesnake", "Coyote", "Lizard"}},
-    {"Ocean", {"Dolphin", "Shark", "Octopus", "Penguin", "Sea Turtle"}},
-    {"Savanna", {"Lion", "Elephant", "Zebra", "Giraffe", "Cheetah"}},
-    {"Mountain", {"Eagle", "Mountain Lion", "Goat", "Yak", "Snow Leopard"}}
+    {"Forest", {"Bear", "Wolf", "Fox", "Deer", "Owl", "bear", "wolf", "fox", "deer", "owl"}},
+    {"Desert", {"Camel", "Scorpion", "Rattlesnake", "Coyote", "Lizard", "camel", "scorpion", "rattlesnake", "coyote", "lizard"}},
+    {"Ocean", {"Dolphin", "Shark", "Octopus", "Penguin", "Sea Turtle", "dolphin", "shark", "octopus", "penguin", "sea turtle", "seaturtle"}},
+    {"Savanna", {"Lion", "Elephant", "Zebra", "Giraffe", "Cheetah", "lion", "elephant", "zebra", "giraffe", "cheetah"}},
+    {"Mountain", {"Eagle", "Mountain Lion", "Goat", "Yak", "Snow Leopard", "eagle", "mountain lion", "goat", "yak", "snow leopard"}}
 };
 
 std::map<std::string, std::vector<std::string>> Habitat::getHabitatSpecies()
