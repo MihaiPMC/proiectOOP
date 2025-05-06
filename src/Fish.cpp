@@ -17,6 +17,12 @@ void Fish::performBehavior() const {
     std::cout << getName() << " the " << getSpecies() << " is swimming." << std::endl;
 }
 
+float Fish::interact(int visitorCount) const {
+    float enjoymentFactor = 0.7f;
+    std::cout << "Visitors watch " << getName() << " swim gracefully with its " << m_finType << " fins." << std::endl;
+    return enjoymentFactor * visitorCount * getIsHealthy();
+}
+
 std::shared_ptr<Animal> Fish::clone() const {
     return std::make_shared<Fish>(*this);
 }

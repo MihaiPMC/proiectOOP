@@ -12,5 +12,6 @@ public:
     const std::string &getFinType() const;
     void setFinType(const std::string &finType);
     virtual void performBehavior() const override;
+    virtual float interact(int visitorCount) const override;
     virtual std::shared_ptr<Animal> clone() const override;
 };

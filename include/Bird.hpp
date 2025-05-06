@@ -11,5 +11,6 @@ public:
     float getWingSpan() const;
     void setWingSpan(float wingSpan);
     virtual void performBehavior() const override;
+    virtual float interact(int visitorCount) const override;
     virtual std::shared_ptr<Animal> clone() const override;
 };

@@ -166,6 +166,11 @@ void Habitat::demonstrateSpecificBehavior(const std::shared_ptr<Animal>& animal)
         std::cout << "This is a mammal with fur color: " << mammal->getFurColor() << std::endl;
         mammal->performBehavior();
     }
+            else if (auto reptile = std::dynamic_pointer_cast<Reptile>(animal)) {
+        std::cout << "This is a reptile with " << reptile->getScalePattern() << " scale pattern" << std::endl;
+        std::cout << "Cold-blooded: " << (reptile->getIsColdBlooded() ? "Yes" : "No") << std::endl;
+        reptile->performBehavior();
+            }
     else {
         std::cout << "Unknown animal type!" << std::endl;
     }
@@ -183,6 +188,42 @@ void Habitat::showSpecificBehaviors() const {
         std::cout << "------------------------" << std::endl;
     }
 }
+
+        float Habitat::calculateVisitorSatisfaction(int visitorCount) const {
+            if (m_animals.empty()) {
+        return 0.0f;
+            }
+            
+            float totalSatisfaction = 0.0f;
+
+            for (const auto& animal : m_animals) {
+        totalSatisfaction += animal->interactWithVisitors(visitorCount / static_cast<int>(m_animals.size()));
+            }
+
+            float cleanlinessMultiplier = 0.5f + (m_cleanlinessLevel * 0.5f);
+            
+            return totalSatisfaction * cleanlinessMultiplier;
+        }
+
+        void Habitat::animalsInteractWithVisitors(int visitorCount) const {
+            std::cout << "\nVisitors are interacting with animals in the " << m_type << " habitat:" << std::endl;
+            
+            if (m_animals.empty()) {
+        std::cout << "There are no animals in this habitat for visitors to interact with." << std::endl;
+        return;
+            }
+            
+            int visitorsPerAnimal = visitorCount / static_cast<int>(m_animals.size());
+            
+            for (const auto& animal : m_animals) {
+        float enjoyment = animal->interactWithVisitors(visitorsPerAnimal);
+        std::cout << "Visitor satisfaction from interaction: " << enjoyment << std::endl;
+        std::cout << "------------------------" << std::endl;
+            }
+            
+            float totalSatisfaction = calculateVisitorSatisfaction(visitorCount);
+            std::cout << "Total visitor satisfaction for " << m_type << " habitat: " << totalSatisfaction << std::endl;
+        }
 
 std::ostream &operator<<(std::ostream &os, const Habitat &habitat)
 {

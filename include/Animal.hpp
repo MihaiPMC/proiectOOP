@@ -44,7 +44,16 @@ public:
     void updateHunger(float deltaTime);
     friend std::ostream &operator<<(std::ostream &os, const Animal &animal);
     static std::string getRandomName();
+
     virtual void performBehavior() const = 0;
+
+    virtual float interact(int visitorCount) const = 0;
+
+    float interactWithVisitors(int visitorCount) const {
+        std::cout << "Visitors are interacting with " << m_name << " the " << m_species << "!" << std::endl;
+        return interact(visitorCount);
+    }
+    
     virtual std::shared_ptr<Animal> clone() const = 0;
     static std::shared_ptr<Animal> createRandomAnimal(const std::string& species, int minAge = 1, int maxAge = 10);
 };

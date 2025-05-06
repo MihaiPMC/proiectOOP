@@ -17,6 +17,14 @@ void Mammal::performBehavior() const {
     std::cout << getName() << " the " << getSpecies() << " is roaming on land." << std::endl;
 }
 
+float Mammal::interact(int visitorCount) const {
+    float enjoymentFactor = 1.5f;
+    std::cout << "Visitors are delighted as " << getName() << " with " << m_furColor 
+              << " fur approaches them and interacts playfully!" << std::endl;
+
+    return enjoymentFactor * visitorCount * getIsHealthy();
+}
+
 std::shared_ptr<Animal> Mammal::clone() const {
     return std::make_shared<Mammal>(*this);
 }

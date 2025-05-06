@@ -9,6 +9,7 @@
 #include "Fish.hpp"
 #include "Bird.hpp"
 #include "Mammal.hpp"
+#include "Reptile.hpp"
 
 class Habitat {
 private:
@@ -51,5 +52,8 @@ public:
     static std::vector<std::string> getAllowedAnimals(const std::string& habitatType);
     void demonstrateSpecificBehavior(const std::shared_ptr<Animal>& animal) const;
     void showSpecificBehaviors() const;
+    float calculateVisitorSatisfaction(int visitorCount) const;
+    void animalsInteractWithVisitors(int visitorCount) const;
+    
     friend std::ostream &operator<<(std::ostream &os, const Habitat &habitat);
 };
