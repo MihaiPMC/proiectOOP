@@ -212,7 +212,7 @@ bool Zoo::addAnimalTo(int habitatIndex, const std::string& animalType)
                     << " to " << m_habitats[habitatIndex].getType() << " habitat!" << std::endl;
             return true;
         }
-        catch (const AnimalException& e) {
+        catch (const AnimalException&) {
             m_budget += animalPrice;
             throw;
         }
