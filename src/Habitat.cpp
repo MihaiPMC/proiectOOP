@@ -153,6 +153,37 @@ void Habitat::updateCleanliness(float deltaTime)
     }
 }
 
+void Habitat::demonstrateSpecificBehavior(const std::shared_ptr<Animal>& animal) const {
+    if (auto fish = std::dynamic_pointer_cast<Fish>(animal)) {
+        std::cout << "This is a fish with fin type: " << fish->getFinType() << std::endl;
+        fish->performBehavior();
+    }
+    else if (auto bird = std::dynamic_pointer_cast<Bird>(animal)) {
+        std::cout << "This is a bird with wingspan: " << bird->getWingSpan() << " meters" << std::endl;
+        bird->performBehavior();
+    }
+    else if (auto mammal = std::dynamic_pointer_cast<Mammal>(animal)) {
+        std::cout << "This is a mammal with fur color: " << mammal->getFurColor() << std::endl;
+        mammal->performBehavior();
+    }
+    else {
+        std::cout << "Unknown animal type!" << std::endl;
+    }
+}
+
+void Habitat::showSpecificBehaviors() const {
+    std::cout << "\nDemonstrating specific behaviors for animals in " << m_type << " habitat:" << std::endl;
+    if (m_animals.empty()) {
+        std::cout << "No animals in this habitat!" << std::endl;
+        return;
+    }
+    
+    for (const auto& animal : m_animals) {
+        demonstrateSpecificBehavior(animal);
+        std::cout << "------------------------" << std::endl;
+    }
+}
+
 std::ostream &operator<<(std::ostream &os, const Habitat &habitat)
 {
     os << "Habitat: " << habitat.m_type << "\n"

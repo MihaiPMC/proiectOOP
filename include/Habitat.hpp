@@ -6,6 +6,9 @@
 #include <map>
 #include <memory>
 #include "ZooExceptions.hpp"
+#include "Fish.hpp"
+#include "Bird.hpp"
+#include "Mammal.hpp"
 
 class Habitat {
 private:
@@ -46,5 +49,7 @@ public:
     bool overlaps(const Habitat& other) const;
     bool isValidPosition(int gridWidth, int gridHeight) const;
     static std::vector<std::string> getAllowedAnimals(const std::string& habitatType);
+    void demonstrateSpecificBehavior(const std::shared_ptr<Animal>& animal) const;
+    void showSpecificBehaviors() const;
     friend std::ostream &operator<<(std::ostream &os, const Habitat &habitat);
 };

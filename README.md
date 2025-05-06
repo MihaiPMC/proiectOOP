@@ -41,7 +41,7 @@ Acesta este un proiect de tip joc, inspirat din jocul Planet Zoo, în care jucă
   - [X] apelarea constructorului din clasa de bază din constructori din derivate
   - [X] clasă cu atribut de tip pointer la o clasă de bază cu derivate; aici apelați funcțiile virtuale prin pointer de bază, eventual prin interfața non-virtuală din bază
     - [X] suprascris cc/op= pentru copieri/atribuiri corecte, copy and swap
-    - [ ] `dynamic_cast`/`std::dynamic_pointer_cast` pentru downcast cu sens
+    - [X] `dynamic_cast`/`std::dynamic_pointer_cast` pentru downcast cu sens
     - [X] smart pointers (recomandat, opțional)
 - [X] excepții
   - [X] ierarhie proprie cu baza `std::exception` sau derivată din `std::exception`; minim **3** clase pentru erori specifice distincte
