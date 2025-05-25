@@ -70,5 +70,15 @@ private:
     int m_movingHabitatIndex;
     int m_originalHabitatX;
     int m_originalHabitatY;
+    
+    // Path building functionality
+    sf::RectangleShape m_buildPathButton;
+    sf::Text m_buildPathButtonText;
+    bool m_isBuildingPath;
+    sf::Texture m_pathTexture;
+    std::vector<std::tuple<int, int>> m_pathTiles;
+    int m_lastPathX;
+    int m_lastPathY;
+
     Zoo m_zoo;
 };
