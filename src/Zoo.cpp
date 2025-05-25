@@ -1,7 +1,7 @@
 #include "../include/Zoo.hpp"
-#include "../include/BudgetException.hpp"
-#include "../include/HabitatException.hpp"
-#include "../include/AnimalException.hpp"
+#include "../include/exception/BudgetException.hpp"
+#include "../include/exception/HabitatException.hpp"
+#include "../include/exception/AnimalException.hpp"
 #include <algorithm>
 #include <random>
 

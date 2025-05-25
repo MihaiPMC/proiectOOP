@@ -4,7 +4,7 @@
 #include <vector>
 #include <map>
 #include "Zoo.hpp"
-#include "ZooExceptions.hpp"
+#include "exception/ZooExceptions.hpp"
 
 class Game
 {

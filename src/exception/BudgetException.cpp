@@ -1,4 +1,4 @@
-#include "../include/BudgetException.hpp"
+#include "../../include/exception/BudgetException.hpp"
 
 BudgetException::BudgetException(const std::string& message) 
     : ZooException("Budget Error: " + message) {}

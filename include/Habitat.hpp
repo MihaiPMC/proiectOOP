@@ -5,7 +5,7 @@
 #include <vector>
 #include <map>
 #include <memory>
-#include "ZooExceptions.hpp"
+#include "exception/ZooExceptions.hpp"
 #include "Fish.hpp"
 #include "Bird.hpp"
 #include "Mammal.hpp"

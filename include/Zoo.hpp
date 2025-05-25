@@ -6,7 +6,7 @@
 #include <iostream>
 #include "Animal.hpp"
 #include "Habitat.hpp"
-#include "ZooExceptions.hpp"
+#include "exception/ZooExceptions.hpp"
 
 class Zoo {
 private:

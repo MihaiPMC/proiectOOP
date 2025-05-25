@@ -1,6 +1,6 @@
 #include "../include/Habitat.hpp"
-#include "../include/HabitatException.hpp"
-#include "../include/AnimalException.hpp"
+#include "../include/exception/HabitatException.hpp"
+#include "../include/exception/AnimalException.hpp"
 
 Habitat::Habitat(const std::string &type, const std::vector<std::shared_ptr<Animal>> &animals, int capacity, float cleanlinessLevel, float price)
     : m_type(type), m_animals(animals), m_capacity(capacity), m_cleanlinessLevel(cleanlinessLevel), m_price(price), m_gridX(-1), m_gridY(-1)

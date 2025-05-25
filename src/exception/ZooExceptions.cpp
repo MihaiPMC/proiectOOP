@@ -1,4 +1,4 @@
-#include "../include/ZooExceptions.hpp"
+#include "../../include/exception/ZooExceptions.hpp"
 
 ZooException::ZooException(const std::string& message) : m_message(message) {}
 
