@@ -1,4 +1,4 @@
-#include "../include/Mammal.hpp"
+#include "../../include/animals/Mammal.hpp"
 
 Mammal::Mammal(const std::string &name, const std::string &species, int age, float weight, float height, const std::string &furColor, float isHealthy, int price, float hunger)
     : Animal(name, species, age, weight, height, isHealthy, price, hunger), m_furColor(furColor)

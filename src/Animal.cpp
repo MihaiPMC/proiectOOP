@@ -1,5 +1,5 @@
 #include "../include/Animal.hpp"
-#include "../include/Mammal.hpp"
+#include "../include/animals/Mammal.hpp"
 #include <random>
 
 Animal::Animal(const std::string &name, const std::string &species, int age, float weight, float height, float is_healthy, int price, float hunger)

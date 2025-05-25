@@ -1,4 +1,4 @@
-#include "../include/Fish.hpp"
+#include "../../include/animals/Fish.hpp"
 
 Fish::Fish(const std::string &name, const std::string &species, int age, float weight, float height, const std::string &finType, float isHealthy, int price, float hunger)
     : Animal(name, species, age, weight, height, isHealthy, price, hunger), m_finType(finType)

@@ -41,14 +41,14 @@ if(NOT PROJECT_SOURCES)
             include/Visitor.hpp
             src/Game.cpp
             include/Game.hpp
-            include/Bird.hpp
-            include/Mammal.hpp
-            include/Fish.hpp
-            src/Bird.cpp
-            src/Mammal.cpp
-            src/Fish.cpp
-            src/Reptile.cpp
-            include/Reptile.hpp
+            include/animals/Bird.hpp
+            include/animals/Mammal.hpp
+            include/animals/Fish.hpp
+            src/animals/Bird.cpp
+            src/animals/Mammal.cpp
+            src/animals/Fish.cpp
+            src/animals/Reptile.cpp
+            include/animals/Reptile.hpp
             src/exception/AnimalException.cpp
             src/exception/BudgetException.cpp
             src/exception/ZooExceptions.cpp

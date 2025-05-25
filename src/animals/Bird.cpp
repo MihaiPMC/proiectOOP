@@ -1,4 +1,4 @@
-#include "../include/Bird.hpp"
+#include "../../include/animals/Bird.hpp"
 
 Bird::Bird(const std::string &name, const std::string &species, int age, float weight, float height, float wingSpan, float isHealthy, int price, float hunger)
     : Animal(name, species, age, weight, height, isHealthy, price, hunger), m_wingSpan(wingSpan)

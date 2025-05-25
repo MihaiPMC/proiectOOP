@@ -1,4 +1,4 @@
-#include "../include/Reptile.hpp"
+#include "../../include/animals/Reptile.hpp"
 
 Reptile::Reptile(const std::string &name, const std::string &species, int age, float weight, float height, 
                  std::string scalePattern, bool isColdBlooded, float isHealthy, int price, float hunger)

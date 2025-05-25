@@ -6,10 +6,10 @@
 #include <map>
 #include <memory>
 #include "exception/ZooExceptions.hpp"
-#include "Fish.hpp"
-#include "Bird.hpp"
-#include "Mammal.hpp"
-#include "Reptile.hpp"
+#include "animals/Fish.hpp"
+#include "animals/Bird.hpp"
+#include "animals/Mammal.hpp"
+#include "animals/Reptile.hpp"
 
 class Habitat {
 private:
