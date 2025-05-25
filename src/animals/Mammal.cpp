@@ -9,10 +9,6 @@ const std::string &Mammal::getFurColor() const {
     return m_furColor;
 }
 
-void Mammal::setFurColor(const std::string &color) {
-    m_furColor = color;
-}
-
 void Mammal::performBehavior() const {
     std::cout << getName() << " the " << getSpecies() << " is roaming on land." << std::endl;
 }

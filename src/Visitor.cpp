@@ -57,16 +57,6 @@ void Visitor::setAge(int newAge)
     m_age = newAge;
 }
 
-float Visitor::getMoney() const
-{
-    return m_money;
-}
-
-void Visitor::setMoney(float newMoney)
-{
-    m_money = newMoney;
-}
-
 const std::string &Visitor::getType() const
 {
     return m_type;

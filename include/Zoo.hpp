@@ -25,13 +25,15 @@ public:
     [[nodiscard]] const std::string &getName() const;
     void setName(const std::string &newName);
     [[nodiscard]] const std::vector<Habitat> &getHabitats() const;
-    void addHabitats(const std::vector<Habitat> &newHabitats);
     void addHabitats(const Habitat &habitat);
+    void addHabitats(const std::vector<Habitat> &newHabitats);
+    // Method to move a habitat to a new position
+    void moveHabitat(size_t habitatIndex, int newX, int newY);
+    
     [[nodiscard]] int getVisitorCount() const;
     void setVisitorCount(int visitor_count);
     [[nodiscard]] bool getIsOpen() const;
     void setIsOpen(bool is_open);
-    void moveHabitat(size_t habitatIndex, int newX, int newY);
     
     [[nodiscard]] float getBudget() const;
     void setBudget(float newBudget);

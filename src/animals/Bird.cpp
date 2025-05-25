@@ -7,9 +7,6 @@ Bird::Bird(const std::string &name, const std::string &species, int age, float w
 float Bird::getWingSpan() const {
     return m_wingSpan;
 }
-void Bird::setWingSpan(float wingSpan) {
-    m_wingSpan = wingSpan;
-}
 void Bird::performBehavior() const {
     std::cout << getName() << " the " << getSpecies() << " is flying." << std::endl;
 }

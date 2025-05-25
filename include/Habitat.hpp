@@ -32,7 +32,6 @@ public:
     void setType(const std::string &newType);
     [[nodiscard]] const std::vector<std::shared_ptr<Animal>> &getAnimals() const;
     void addAnimals(const std::vector<std::shared_ptr<Animal>> &newAnimals);
-    void addAnimal(const std::shared_ptr<Animal> &animal);
     [[nodiscard]] int getCapacity() const;
     void setCapacity(int newCapacity);
     [[nodiscard]] float getCleanlinessLevel() const;
@@ -41,19 +40,20 @@ public:
     void setPrice(float new_price);
     void cleanHabitat();
     void updateCleanliness(float deltaTime);
-    static std::map<std::string, std::vector<std::string>> getHabitatSpecies();
-    static std::string selectHabitatType();
-    void addRandomAnimals(int count, float &budget);
+    void addAnimal(const std::shared_ptr<Animal> &animal);
     void setPosition(int x, int y);
     int getGridX() const;
     int getGridY() const;
-    bool overlaps(const Habitat& other) const;
+    bool overlaps(const Habitat &other) const;
     bool isValidPosition(int gridWidth, int gridHeight) const;
+    void showSpecificBehaviors() const;
+    void animalsInteractWithVisitors(int visitorCount) const;
     static std::vector<std::string> getAllowedAnimals(const std::string& habitatType);
     void demonstrateSpecificBehavior(const std::shared_ptr<Animal>& animal) const;
-    void showSpecificBehaviors() const;
     float calculateVisitorSatisfaction(int visitorCount) const;
-    void animalsInteractWithVisitors(int visitorCount) const;
+    static std::map<std::string, std::vector<std::string>> getHabitatSpecies();
+    static std::string selectHabitatType();
+    void addRandomAnimals(int count, float &budget);
     
     friend std::ostream &operator<<(std::ostream &os, const Habitat &habitat);
 };

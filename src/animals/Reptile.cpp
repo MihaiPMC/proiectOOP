@@ -11,16 +11,8 @@ bool Reptile::getIsColdBlooded() const {
     return m_isColdBlooded;
 }
 
-void Reptile::setIsColdBlooded(bool isColdBlooded) {
-    m_isColdBlooded = isColdBlooded;
-}
-
 const std::string& Reptile::getScalePattern() const {
     return m_scalePattern;
-}
-
-void Reptile::setScalePattern(const std::string& pattern) {
-    m_scalePattern = pattern;
 }
 
 void Reptile::performBehavior() const {

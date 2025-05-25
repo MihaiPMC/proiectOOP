@@ -21,8 +21,6 @@ public:
     void setName(const std::string &NewName);
     [[nodiscard]] int getAge() const;
     void setAge(int newAge);
-    [[nodiscard]] float getMoney() const;
-    void setMoney(float newMoney);
     [[nodiscard]] const std::string &getType() const;
     void setType(const std::string &newType);
     friend std::ostream &operator<<(std::ostream &os, const Visitor &visitor);

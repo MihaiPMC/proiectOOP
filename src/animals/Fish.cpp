@@ -9,10 +9,6 @@ const std::string &Fish::getFinType() const {
     return m_finType;
 }
 
-void Fish::setFinType(const std::string &finType) {
-    m_finType = finType;
-}
-
 void Fish::performBehavior() const {
     std::cout << getName() << " the " << getSpecies() << " is swimming." << std::endl;
 }
