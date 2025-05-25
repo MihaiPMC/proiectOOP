@@ -115,33 +115,38 @@ std::ostream &operator<<(std::ostream &os, const Zoo &zoo)
 
 bool Zoo::spendMoney(float amount)
 {
-    if (m_budget >= amount) {
+    if (m_budget >= amount)
+    {
         m_budget -= amount;
         return true;
     }
-    throw BudgetException("Not enough funds to spend $" + std::to_string(amount) + 
+    throw BudgetException("Not enough funds to spend $" + std::to_string(amount) +
                           ". Current budget: $" + std::to_string(m_budget));
 }
 
 bool Zoo::canBuildAt(int gridX, int gridY, int gridWidth, int gridHeight) const
 {
-    if (gridX < 1 || gridY < 1 || (gridX + 3) > (gridWidth - 1) || (gridY + 3) > (gridHeight - 1)) {
+    if (gridX < 1 || gridY < 1 || (gridX + 3) > (gridWidth - 1) || (gridY + 3) > (gridHeight - 1))
+    {
         std::cout << "Cannot build at (" << gridX << "," << gridY << "): Outside of buildable area" << std::endl;
         return false;
     }
 
-    for (const auto &habitat : m_habitats) {
-        if (habitat.getGridX() != -1) {
+    for (const auto &habitat: m_habitats)
+    {
+        if (habitat.getGridX() != -1)
+        {
             int hx = habitat.getGridX();
             int hy = habitat.getGridY();
-            
-            
+
+
             bool overlapsX = (gridX < hx + 3) && (gridX + 3 > hx);
             bool overlapsY = (gridY < hy + 3) && (gridY + 3 > hy);
-            
-            if (overlapsX && overlapsY) {
-                std::cout << "Cannot build at (" << gridX << "," << gridY 
-                          << "): Overlaps with habitat at (" << hx << "," << hy << ")" << std::endl;
+
+            if (overlapsX && overlapsY)
+            {
+                std::cout << "Cannot build at (" << gridX << "," << gridY
+                        << "): Overlaps with habitat at (" << hx << "," << hy << ")" << std::endl;
                 return false;
             }
         }
@@ -151,79 +156,93 @@ bool Zoo::canBuildAt(int gridX, int gridY, int gridWidth, int gridHeight) const
     return true;
 }
 
-bool Zoo::buildHabitatAt(const std::string& type, int gridX, int gridY, int gridWidth, int gridHeight) {
-    std::cout << "Attempting to build " << type << " habitat at position (" << gridX << "," << gridY << ")" << std::endl;
-    
-    if (!canBuildAt(gridX, gridY, gridWidth, gridHeight)) {
-        throw HabitatException("Cannot place habitat at position (" + std::to_string(gridX) + 
+bool Zoo::buildHabitatAt(const std::string &type, int gridX, int gridY, int gridWidth, int gridHeight)
+{
+    std::cout << "Attempting to build " << type << " habitat at position (" << gridX << "," << gridY << ")" <<
+            std::endl;
+
+    if (!canBuildAt(gridX, gridY, gridWidth, gridHeight))
+    {
+        throw HabitatException("Cannot place habitat at position (" + std::to_string(gridX) +
                                "," + std::to_string(gridY) + ") - invalid location");
     }
-    
+
     Habitat newHabitat(type, {});
     float habitatPrice = newHabitat.getPrice();
 
-    try {
+    try
+    {
         spendMoney(habitatPrice);
         newHabitat.setPosition(gridX, gridY);
         m_habitats.push_back(newHabitat);
-        
-        std::cout << "Habitat " << type << " built successfully at position (" << gridX << "," << gridY << ")" << std::endl;
+
+        std::cout << "Habitat " << type << " built successfully at position (" << gridX << "," << gridY << ")" <<
+                std::endl;
         return true;
-    }
-    catch (const BudgetException& e) {
+    } catch (const BudgetException &e)
+    {
         std::cout << e.what() << std::endl;
         return false;
     }
 }
 
-int Zoo::findHabitatAt(int gridX, int gridY) const {
-    for (size_t i = 0; i < m_habitats.size(); i++) {
-        const Habitat& habitat = m_habitats[i];
+int Zoo::findHabitatAt(int gridX, int gridY) const
+{
+    for (size_t i = 0; i < m_habitats.size(); i++)
+    {
+        const Habitat &habitat = m_habitats[i];
         int hx = habitat.getGridX();
         int hy = habitat.getGridY();
-        
+
         if (gridX >= hx && gridX < hx + 3 &&
-            gridY >= hy && gridY < hy + 3) {
+            gridY >= hy && gridY < hy + 3)
+        {
             return static_cast<int>(i);
         }
     }
     return -1;
 }
-            
-            void Zoo::moveHabitat(size_t habitatIndex, int newX, int newY) {
-                if (habitatIndex < m_habitats.size()) {
-                    m_habitats[habitatIndex].setPosition(newX, newY);
-                }
-            }
 
-bool Zoo::addAnimalTo(int habitatIndex, const std::string& animalType)
+void Zoo::moveHabitat(size_t habitatIndex, int newX, int newY)
 {
-    if (habitatIndex < 0 || habitatIndex >= static_cast<int>(m_habitats.size())) {
+    if (habitatIndex < m_habitats.size())
+    {
+        m_habitats[habitatIndex].setPosition(newX, newY);
+    }
+}
+
+bool Zoo::addAnimalTo(int habitatIndex, const std::string &animalType)
+{
+    if (habitatIndex < 0 || habitatIndex >= static_cast<int>(m_habitats.size()))
+    {
         throw HabitatException("Invalid habitat index: " + std::to_string(habitatIndex));
     }
-    
+
     auto newAnimal = Animal::createRandomAnimal(animalType);
-    if (!newAnimal) {
+    if (!newAnimal)
+    {
         throw AnimalException("Failed to create animal of type: " + animalType);
     }
-    
+
     float animalPrice = newAnimal->getPrice();
 
-    try {
+    try
+    {
         spendMoney(animalPrice);
-        
-        try {
+
+        try
+        {
             m_habitats[habitatIndex].addAnimal(newAnimal);
             std::cout << "Added " << newAnimal->getName() << " the " << animalType
                     << " to " << m_habitats[habitatIndex].getType() << " habitat!" << std::endl;
             return true;
-        }
-        catch (const AnimalException&) {
+        } catch (const AnimalException &)
+        {
             m_budget += animalPrice;
             throw;
         }
-    }
-    catch (const BudgetException& e) {
+    } catch (const BudgetException &e)
+    {
         std::cout << e.what() << std::endl;
         return false;
     }

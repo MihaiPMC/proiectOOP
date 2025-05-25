@@ -2,8 +2,10 @@
 #include "../include/animals/Mammal.hpp"
 #include <random>
 
-Animal::Animal(const std::string &name, const std::string &species, int age, float weight, float height, float is_healthy, int price, float hunger)
-    : m_name(name), m_species(species), m_age(age), m_weight(weight), m_height(height), m_isHealthy(is_healthy), m_price(price), m_foodLevel(hunger)
+Animal::Animal(const std::string &name, const std::string &species, int age, float weight, float height,
+               float is_healthy, int price, float hunger)
+    : m_name(name), m_species(species), m_age(age), m_weight(weight), m_height(height), m_isHealthy(is_healthy),
+      m_price(price), m_foodLevel(hunger)
 {
 }
 
@@ -153,13 +155,13 @@ void Animal::updateHunger(float deltaTime)
 std::ostream &operator<<(std::ostream &os, const Animal &animal)
 {
     os << "Animal: " << animal.m_name << "\n"
-       << "  Species: " << animal.m_species << "\n"
-       << "  Age: " << animal.m_age << " years\n"
-       << "  Weight: " << animal.m_weight << " kg\n"
-       << "  Height: " << animal.m_height << " cm\n"
-       << "  Health Status: " << (animal.m_isHealthy * 100) << "%" << "\n"
-       << "  Hunger Level: " << (animal.m_foodLevel * 100) << "%" << "\n"
-       << "  Price: $" << animal.m_price;
+            << "  Species: " << animal.m_species << "\n"
+            << "  Age: " << animal.m_age << " years\n"
+            << "  Weight: " << animal.m_weight << " kg\n"
+            << "  Height: " << animal.m_height << " cm\n"
+            << "  Health Status: " << (animal.m_isHealthy * 100) << "%" << "\n"
+            << "  Hunger Level: " << (animal.m_foodLevel * 100) << "%" << "\n"
+            << "  Price: $" << animal.m_price;
     return os;
 }
 
@@ -258,6 +260,7 @@ std::vector<std::string> Animal::s_animalNames = {
     "Pele", "Penelope", "Penny", "Pepe", "Pepper", "Percy", "Periwinkle", "Perkins", "Perry", "Petunia",
     "Phantom", "Pharaoh", "Phoenix", "Phyllis", "Picasso", "Pickles", "Pierce", "Pierre", "Piglet", "Pilot"
 };
+
 std::string Animal::getRandomName()
 {
     static std::random_device rd;

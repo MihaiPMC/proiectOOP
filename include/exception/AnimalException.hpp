@@ -4,9 +4,10 @@
 #include "ZooExceptions.hpp"
 #include <string>
 
-class AnimalException : public ZooException {
+class AnimalException : public ZooException
+{
 public:
-    explicit AnimalException(const std::string& message);
+    explicit AnimalException(const std::string &message);
 };
 
 #endif // ANIMAL_EXCEPTION_H

@@ -2,8 +2,10 @@
 #include "../include/exception/HabitatException.hpp"
 #include "../include/exception/AnimalException.hpp"
 
-Habitat::Habitat(const std::string &type, const std::vector<std::shared_ptr<Animal>> &animals, int capacity, float cleanlinessLevel, float price)
-    : m_type(type), m_animals(animals), m_capacity(capacity), m_cleanlinessLevel(cleanlinessLevel), m_price(price), m_gridX(-1), m_gridY(-1)
+Habitat::Habitat(const std::string &type, const std::vector<std::shared_ptr<Animal> > &animals, int capacity,
+                 float cleanlinessLevel, float price)
+    : m_type(type), m_animals(animals), m_capacity(capacity), m_cleanlinessLevel(cleanlinessLevel), m_price(price),
+      m_gridX(-1), m_gridY(-1)
 {
 }
 
@@ -59,12 +61,12 @@ void Habitat::setType(const std::string &newType)
     m_type = newType;
 }
 
-const std::vector<std::shared_ptr<Animal>> &Habitat::getAnimals() const
+const std::vector<std::shared_ptr<Animal> > &Habitat::getAnimals() const
 {
     return m_animals;
 }
 
-void Habitat::addAnimals(const std::vector<std::shared_ptr<Animal>> &newAnimals)
+void Habitat::addAnimals(const std::vector<std::shared_ptr<Animal> > &newAnimals)
 {
     for (const auto &animal: newAnimals)
     {
@@ -72,12 +74,16 @@ void Habitat::addAnimals(const std::vector<std::shared_ptr<Animal>> &newAnimals)
     }
 }
 
-bool caseInsensitiveCompare(const std::string& str1, const std::string& str2) {
-    if (str1.size() != str2.size()) {
+bool caseInsensitiveCompare(const std::string &str1, const std::string &str2)
+{
+    if (str1.size() != str2.size())
+    {
         return false;
     }
-    for (size_t i = 0; i < str1.size(); i++) {
-        if (std::tolower(str1[i]) != std::tolower(str2[i])) {
+    for (size_t i = 0; i < str1.size(); i++)
+    {
+        if (std::tolower(str1[i]) != std::tolower(str2[i]))
+        {
             return false;
         }
     }
@@ -86,23 +92,27 @@ bool caseInsensitiveCompare(const std::string& str1, const std::string& str2) {
 
 void Habitat::addAnimal(const std::shared_ptr<Animal> &animal)
 {
-    if (static_cast<int>(m_animals.size()) >= m_capacity) {
+    if (static_cast<int>(m_animals.size()) >= m_capacity)
+    {
         throw HabitatException("Habitat has reached its capacity of " + std::to_string(m_capacity) + " animals");
     }
 
     bool allowed = false;
-    const auto& compatibleSpecies = s_habitatSpecies[m_type];
-    for (const auto& species : compatibleSpecies) {
-        if (caseInsensitiveCompare(animal->getSpecies(), species)) {
+    const auto &compatibleSpecies = s_habitatSpecies[m_type];
+    for (const auto &species: compatibleSpecies)
+    {
+        if (caseInsensitiveCompare(animal->getSpecies(), species))
+        {
             allowed = true;
             break;
         }
     }
-    
-    if (!allowed) {
+
+    if (!allowed)
+    {
         throw AnimalException(animal->getSpecies() + " cannot live in a " + m_type + " habitat");
     }
-    
+
     m_animals.push_back(animal);
 }
 
@@ -153,97 +163,127 @@ void Habitat::updateCleanliness(float deltaTime)
     }
 }
 
-void Habitat::demonstrateSpecificBehavior(const std::shared_ptr<Animal>& animal) const {
-    if (auto fish = std::dynamic_pointer_cast<Fish>(animal)) {
+void Habitat::demonstrateSpecificBehavior(const std::shared_ptr<Animal> &animal) const
+{
+    if (auto fish = std::dynamic_pointer_cast<Fish>(animal))
+    {
         std::cout << "This is a fish with fin type: " << fish->getFinType() << std::endl;
         fish->performBehavior();
     }
-    else if (auto bird = std::dynamic_pointer_cast<Bird>(animal)) {
+    else if (auto bird = std::dynamic_pointer_cast<Bird>(animal))
+    {
         std::cout << "This is a bird with wingspan: " << bird->getWingSpan() << " meters" << std::endl;
         bird->performBehavior();
     }
-    else if (auto mammal = std::dynamic_pointer_cast<Mammal>(animal)) {
+    else if (auto mammal = std::dynamic_pointer_cast<Mammal>(animal))
+    {
         std::cout << "This is a mammal with fur color: " << mammal->getFurColor() << std::endl;
         mammal->performBehavior();
     }
-            else if (auto reptile = std::dynamic_pointer_cast<Reptile>(animal)) {
+    else if (auto reptile = std::dynamic_pointer_cast<Reptile>(animal))
+    {
         std::cout << "This is a reptile with " << reptile->getScalePattern() << " scale pattern" << std::endl;
         std::cout << "Cold-blooded: " << (reptile->getIsColdBlooded() ? "Yes" : "No") << std::endl;
         reptile->performBehavior();
-            }
-    else {
+    }
+    else
+    {
         std::cout << "Unknown animal type!" << std::endl;
     }
 }
 
-void Habitat::showSpecificBehaviors() const {
+void Habitat::showSpecificBehaviors() const
+{
     std::cout << "\nDemonstrating specific behaviors for animals in " << m_type << " habitat:" << std::endl;
-    if (m_animals.empty()) {
+    if (m_animals.empty())
+    {
         std::cout << "No animals in this habitat!" << std::endl;
         return;
     }
-    
-    for (const auto& animal : m_animals) {
+
+    for (const auto &animal: m_animals)
+    {
         demonstrateSpecificBehavior(animal);
         std::cout << "------------------------" << std::endl;
     }
 }
 
-        float Habitat::calculateVisitorSatisfaction(int visitorCount) const {
-            if (m_animals.empty()) {
+float Habitat::calculateVisitorSatisfaction(int visitorCount) const
+{
+    if (m_animals.empty())
+    {
         return 0.0f;
-            }
-            
-            float totalSatisfaction = 0.0f;
+    }
 
-            for (const auto& animal : m_animals) {
+    float totalSatisfaction = 0.0f;
+
+    for (const auto &animal: m_animals)
+    {
         totalSatisfaction += animal->interactWithVisitors(visitorCount / static_cast<int>(m_animals.size()));
-            }
+    }
 
-            float cleanlinessMultiplier = 0.5f + (m_cleanlinessLevel * 0.5f);
-            
-            return totalSatisfaction * cleanlinessMultiplier;
-        }
+    float cleanlinessMultiplier = 0.5f + (m_cleanlinessLevel * 0.5f);
 
-        void Habitat::animalsInteractWithVisitors(int visitorCount) const {
-            std::cout << "\nVisitors are interacting with animals in the " << m_type << " habitat:" << std::endl;
-            
-            if (m_animals.empty()) {
+    return totalSatisfaction * cleanlinessMultiplier;
+}
+
+void Habitat::animalsInteractWithVisitors(int visitorCount) const
+{
+    std::cout << "\nVisitors are interacting with animals in the " << m_type << " habitat:" << std::endl;
+
+    if (m_animals.empty())
+    {
         std::cout << "There are no animals in this habitat for visitors to interact with." << std::endl;
         return;
-            }
-            
-            int visitorsPerAnimal = visitorCount / static_cast<int>(m_animals.size());
-            
-            for (const auto& animal : m_animals) {
+    }
+
+    int visitorsPerAnimal = visitorCount / static_cast<int>(m_animals.size());
+
+    for (const auto &animal: m_animals)
+    {
         float enjoyment = animal->interactWithVisitors(visitorsPerAnimal);
         std::cout << "Visitor satisfaction from interaction: " << enjoyment << std::endl;
         std::cout << "------------------------" << std::endl;
-            }
-            
-            float totalSatisfaction = calculateVisitorSatisfaction(visitorCount);
-            std::cout << "Total visitor satisfaction for " << m_type << " habitat: " << totalSatisfaction << std::endl;
-        }
+    }
+
+    float totalSatisfaction = calculateVisitorSatisfaction(visitorCount);
+    std::cout << "Total visitor satisfaction for " << m_type << " habitat: " << totalSatisfaction << std::endl;
+}
 
 std::ostream &operator<<(std::ostream &os, const Habitat &habitat)
 {
     os << "Habitat: " << habitat.m_type << "\n"
-       << "  Capacity: " << habitat.m_capacity << "\n"
-       << "  Cleanliness: " << (habitat.m_cleanlinessLevel * 100) << "%" << "\n"
-       << "  Price: $" << habitat.m_price << "\n"
-       << "  Animals: " << habitat.m_animals.size();
+            << "  Capacity: " << habitat.m_capacity << "\n"
+            << "  Cleanliness: " << (habitat.m_cleanlinessLevel * 100) << "%" << "\n"
+            << "  Price: $" << habitat.m_price << "\n"
+            << "  Animals: " << habitat.m_animals.size();
     return os;
 }
 
-std::map<std::string, std::vector<std::string>> Habitat::s_habitatSpecies = {
+std::map<std::string, std::vector<std::string> > Habitat::s_habitatSpecies = {
     {"Forest", {"Bear", "Wolf", "Fox", "Deer", "Owl", "bear", "wolf", "fox", "deer", "owl"}},
-    {"Desert", {"Camel", "Scorpion", "Rattlesnake", "Coyote", "Lizard", "camel", "scorpion", "rattlesnake", "coyote", "lizard"}},
-    {"Ocean", {"Dolphin", "Shark", "Octopus", "Penguin", "Sea Turtle", "dolphin", "shark", "octopus", "penguin", "sea turtle", "seaturtle"}},
+    {
+        "Desert",
+        {"Camel", "Scorpion", "Rattlesnake", "Coyote", "Lizard", "camel", "scorpion", "rattlesnake", "coyote", "lizard"}
+    },
+    {
+        "Ocean",
+        {
+            "Dolphin", "Shark", "Octopus", "Penguin", "Sea Turtle", "dolphin", "shark", "octopus", "penguin",
+            "sea turtle", "seaturtle"
+        }
+    },
     {"Savanna", {"Lion", "Elephant", "Zebra", "Giraffe", "Cheetah", "lion", "elephant", "zebra", "giraffe", "cheetah"}},
-    {"Mountain", {"Eagle", "Mountain Lion", "Goat", "Yak", "Snow Leopard", "eagle", "mountain lion", "goat", "yak", "snow leopard"}}
+    {
+        "Mountain",
+        {
+            "Eagle", "Mountain Lion", "Goat", "Yak", "Snow Leopard", "eagle", "mountain lion", "goat", "yak",
+            "snow leopard"
+        }
+    }
 };
 
-std::map<std::string, std::vector<std::string>> Habitat::getHabitatSpecies()
+std::map<std::string, std::vector<std::string> > Habitat::getHabitatSpecies()
 {
     return s_habitatSpecies;
 }
@@ -253,7 +293,8 @@ std::string Habitat::selectHabitatType()
     int habitatType;
     do
     {
-        std::cout << "What habitat do you want to add? 1. Forest 2. Desert 3. Ocean 4. Savanna 5. Mountain" << std::endl;
+        std::cout << "What habitat do you want to add? 1. Forest 2. Desert 3. Ocean 4. Savanna 5. Mountain" <<
+                std::endl;
         std::cin >> habitatType;
         if (habitatType < 1 || habitatType > 5)
             std::cout << "Invalid habitat type! Please choose again." << std::endl;
@@ -302,7 +343,7 @@ void Habitat::addRandomAnimals(int count, float &budget)
         addAnimal(newAnimal);
         budget -= newAnimal->getPrice();
         std::cout << "Added " << newAnimal->getName() << " the " << newAnimal->getSpecies()
-                  << " to " << m_type << " habitat!" << std::endl;
+                << " to " << m_type << " habitat!" << std::endl;
         std::cout << "Remaining budget: $" << budget << std::endl;
     }
 }
@@ -327,7 +368,8 @@ bool Habitat::overlaps(const Habitat &other) const
 {
     if (m_gridX == -1 || other.m_gridX == -1)
         return false;
-    return !(m_gridX + 3 <= other.m_gridX || other.m_gridX + 3 <= m_gridX || m_gridY + 3 <= other.m_gridY || other.m_gridY + 3 <= m_gridY);
+    return !(m_gridX + 3 <= other.m_gridX || other.m_gridX + 3 <= m_gridX || m_gridY + 3 <= other.m_gridY || other.
+             m_gridY + 3 <= m_gridY);
 }
 
 bool Habitat::isValidPosition(int gridWidth, int gridHeight) const

@@ -7,29 +7,35 @@
 
 int main()
 {
-    try {
+    try
+    {
         Game game;
         game.run();
         return 0;
-    }
-    catch (const BudgetException& e) {
+    } catch (const BudgetException &e)
+    {
         std::cerr << "BUDGET ERROR: " << e.what() << std::endl;
     }
-    catch (const HabitatException& e) {
+    catch (const HabitatException &e)
+    {
         std::cerr << "HABITAT ERROR: " << e.what() << std::endl;
     }
-    catch (const AnimalException& e) {
+    catch (const AnimalException &e)
+    {
         std::cerr << "ANIMAL ERROR: " << e.what() << std::endl;
     }
-    catch (const ZooException& e) {
+    catch (const ZooException &e)
+    {
         std::cerr << "ZOO ERROR: " << e.what() << std::endl;
     }
-    catch (const std::exception& e) {
+    catch (const std::exception &e)
+    {
         std::cerr << "UNEXPECTED ERROR: " << e.what() << std::endl;
     }
-    catch (...) {
+    catch (...)
+    {
         std::cerr << "UNKNOWN ERROR OCCURRED" << std::endl;
     }
-    
+
     return 1;
 }

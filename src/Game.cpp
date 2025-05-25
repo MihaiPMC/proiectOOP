@@ -120,17 +120,18 @@ Game::Game()
     m_addAnimalButtonText.setFillColor(sf::Color::White);
     m_addAnimalButtonText.setString("Add Animal");
     m_addAnimalButtonText.setPosition(m_addAnimalButton.getPosition().x + 10, m_addAnimalButton.getPosition().y + 5);
-    
+
     m_moveHabitatButton.setSize(sf::Vector2f(150, 40));
     m_moveHabitatButton.setFillColor(sf::Color(200, 100, 200));
     m_moveHabitatButton.setPosition(m_buildHabitatButton.getPosition().x,
-                                  m_addAnimalButton.getPosition().y + m_addAnimalButton.getSize().y + 10);
+                                    m_addAnimalButton.getPosition().y + m_addAnimalButton.getSize().y + 10);
     m_moveHabitatButtonText.setFont(m_font);
     m_moveHabitatButtonText.setCharacterSize(20);
     m_moveHabitatButtonText.setFillColor(sf::Color::White);
     m_moveHabitatButtonText.setString("Move Habitat");
-    m_moveHabitatButtonText.setPosition(m_moveHabitatButton.getPosition().x + 10, m_moveHabitatButton.getPosition().y + 5);
-    
+    m_moveHabitatButtonText.setPosition(m_moveHabitatButton.getPosition().x + 10,
+                                        m_moveHabitatButton.getPosition().y + 5);
+
     m_statusMessage.setFont(m_font);
     m_statusMessage.setCharacterSize(16);
     m_statusMessage.setFillColor(sf::Color::Yellow);
@@ -283,7 +284,8 @@ void Game::processEvents()
                 std::cout << "Animal addition canceled." << std::endl;
                 continue;
             }
-            else if (!m_isAddingAnimal && !m_isMovingHabitat && m_addAnimalButton.getGlobalBounds().contains(mousePos.x, mousePos.y))
+            else if (!m_isAddingAnimal && !m_isMovingHabitat && m_addAnimalButton.getGlobalBounds().contains(
+                         mousePos.x, mousePos.y))
             {
                 m_isAddingAnimal = true;
                 m_selectedHabitatIndex = -1;
@@ -298,7 +300,8 @@ void Game::processEvents()
                 std::cout << "Habitat move canceled." << std::endl;
                 continue;
             }
-            else if (!m_isAddingAnimal && !m_isBuildingHabitat && !m_showHabitatOptions && m_moveHabitatButton.getGlobalBounds().contains(mousePos.x, mousePos.y))
+            else if (!m_isAddingAnimal && !m_isBuildingHabitat && !m_showHabitatOptions && m_moveHabitatButton.
+                     getGlobalBounds().contains(mousePos.x, mousePos.y))
             {
                 m_isMovingHabitat = true;
                 m_movingHabitatIndex = -1;
@@ -343,8 +346,9 @@ void Game::processEvents()
                 {
                     int cellX = mousePos.x / m_tileSize;
                     int cellY = mousePos.y / m_tileSize;
-            
-                    try {
+
+                    try
+                    {
                         if (m_zoo.buildHabitatAt(m_selectedHabitatType, cellX, cellY, m_gridWidth, m_gridHeight))
                         {
                             std::string builtType = m_selectedHabitatType;
@@ -352,17 +356,19 @@ void Game::processEvents()
                             m_animalsInHabitat.push_back({});
                             m_selectedHabitatType = "";
                             m_isBuildingHabitat = false;
-                            std::cout << "Successfully built " << builtType << " habitat at position (" 
-                                      << cellX << "," << cellY << ")" << std::endl;
+                            std::cout << "Successfully built " << builtType << " habitat at position ("
+                                    << cellX << "," << cellY << ")" << std::endl;
                         }
-                    }
-                    catch (const HabitatException& e) {
+                    } catch (const HabitatException &e)
+                    {
                         std::cout << e.what() << std::endl;
                     }
-                    catch (const BudgetException& e) {
+                    catch (const BudgetException &e)
+                    {
                         std::cout << e.what() << std::endl;
                     }
-                    catch (const std::exception& e) {
+                    catch (const std::exception &e)
+                    {
                         std::cout << "Error: " << e.what() << std::endl;
                     }
                 }
@@ -373,13 +379,13 @@ void Game::processEvents()
                 {
                     int gridX = mousePos.x / m_tileSize;
                     int gridY = mousePos.y / m_tileSize;
-                    
+
                     for (size_t i = 0; i < m_habitatBuildings.size(); i++)
                     {
                         int hx, hy;
                         std::string type;
                         std::tie(hx, hy, type) = m_habitatBuildings[i];
-                        
+
                         if (gridX >= hx && gridX < hx + 3 && gridY >= hy && gridY < hy + 3)
                         {
                             m_movingHabitatIndex = i;
@@ -394,26 +400,27 @@ void Game::processEvents()
                 {
                     int newX = mousePos.x / m_tileSize;
                     int newY = mousePos.y / m_tileSize;
-                    
+
                     bool isValidPosition = true;
-                    
-                    if (newX < 1 || newY < 1 || newX + 2 >= static_cast<int>(m_gridWidth) - 1 || newY + 2 >= static_cast<int>(m_gridHeight) - 1)
+
+                    if (newX < 1 || newY < 1 || newX + 2 >= static_cast<int>(m_gridWidth) - 1 || newY + 2 >= static_cast
+                        <int>(m_gridHeight) - 1)
                     {
                         isValidPosition = false;
                     }
-                    
+
                     if (isValidPosition)
                     {
                         for (size_t i = 0; i < m_habitatBuildings.size(); i++)
                         {
-                            if (static_cast<int>(i) == m_movingHabitatIndex) 
+                            if (static_cast<int>(i) == m_movingHabitatIndex)
                                 continue;
                             int hx, hy;
                             std::tie(hx, hy, std::ignore) = m_habitatBuildings[i];
-                            
+
                             bool overlapsX = (newX < hx + 3) && (newX + 3 > hx);
                             bool overlapsY = (newY < hy + 3) && (newY + 3 > hy);
-                            
+
                             if (overlapsX && overlapsY)
                             {
                                 isValidPosition = false;
@@ -421,28 +428,30 @@ void Game::processEvents()
                             }
                         }
                     }
-                    
+
                     if (isValidPosition)
                     {
                         int oldX, oldY;
                         std::string type;
                         std::tie(oldX, oldY, type) = m_habitatBuildings[m_movingHabitatIndex];
-                        
+
                         m_habitatBuildings[m_movingHabitatIndex] = std::make_tuple(newX, newY, type);
-                        
-                        if (m_movingHabitatIndex >= 0 && static_cast<size_t>(m_movingHabitatIndex) < m_zoo.getHabitats().size()) {
+
+                        if (m_movingHabitatIndex >= 0 && static_cast<size_t>(m_movingHabitatIndex) < m_zoo.getHabitats()
+                            .size())
+                        {
                             m_zoo.moveHabitat(static_cast<size_t>(m_movingHabitatIndex), newX, newY);
                         }
-                        
-                        std::cout << "Moved habitat from (" << oldX << "," << oldY << ") to (" 
+
+                        std::cout << "Moved habitat from (" << oldX << "," << oldY << ") to ("
                                 << newX << "," << newY << ")" << std::endl;
-                        
+
                         m_isMovingHabitat = false;
                         m_movingHabitatIndex = -1;
                     }
                     else
                     {
-                        std::cout << "Cannot place habitat at (" << newX << "," << newY 
+                        std::cout << "Cannot place habitat at (" << newX << "," << newY
                                 << ") - invalid position" << std::endl;
                     }
                 }
@@ -453,29 +462,32 @@ void Game::processEvents()
                 {
                     int gridX = mousePos.x / m_tileSize;
                     int gridY = mousePos.y / m_tileSize;
-                    
+
                     int habitatIndex = m_zoo.findHabitatAt(gridX, gridY);
-                    
+
                     if (habitatIndex != -1)
                     {
                         m_selectedHabitatIndex = habitatIndex;
-                        
+
                         std::string type;
-                        if (habitatIndex < static_cast<int>(m_habitatBuildings.size())) {
+                        if (habitatIndex < static_cast<int>(m_habitatBuildings.size()))
+                        {
                             std::tie(std::ignore, std::ignore, type) = m_habitatBuildings[habitatIndex];
-                        } else {
+                        }
+                        else
+                        {
                             type = m_zoo.getHabitats()[habitatIndex].getType();
                         }
-                        
+
                         std::vector<std::string> allowed = Habitat::getAllowedAnimals(type);
-            
+
                         m_animalOptionButtons.clear();
                         m_animalOptionTexts.clear();
-            
+
                         float optWidth = 120, optHeight = 40;
                         float optStartX = m_addAnimalButton.getPosition().x + m_addAnimalButton.getSize().x + 10;
                         float optStartY = m_addAnimalButton.getPosition().y;
-            
+
                         for (size_t j = 0; j < allowed.size(); j++)
                         {
                             sf::RectangleShape btn;
@@ -483,7 +495,7 @@ void Game::processEvents()
                             btn.setFillColor(sf::Color(200, 200, 100));
                             btn.setPosition(optStartX + j * (optWidth + 10), optStartY);
                             m_animalOptionButtons.push_back(btn);
-            
+
                             sf::Text txt;
                             txt.setFont(m_font);
                             txt.setCharacterSize(18);
@@ -491,7 +503,7 @@ void Game::processEvents()
                             txt.setString(allowed[j]);
                             txt.setPosition(btn.getPosition().x + 10, btn.getPosition().y + 5);
                             m_animalOptionTexts.push_back(txt);
-            
+
                             if (m_animalTextures.find(allowed[j]) == m_animalTextures.end())
                             {
                                 std::string lowerType;
@@ -516,22 +528,26 @@ void Game::processEvents()
                         {
                             m_selectedAnimalType = m_animalOptionTexts[i].getString();
 
-                            try {
+                            try
+                            {
                                 if (m_zoo.addAnimalTo(m_selectedHabitatIndex, m_selectedAnimalType))
                                 {
                                     m_animalsInHabitat[m_selectedHabitatIndex].push_back(m_selectedAnimalType);
                                 }
-                            }
-                            catch (const HabitatException& e) {
+                            } catch (const HabitatException &e)
+                            {
                                 std::cout << e.what() << std::endl;
                             }
-                            catch (const AnimalException& e) {
+                            catch (const AnimalException &e)
+                            {
                                 std::cout << e.what() << std::endl;
                             }
-                            catch (const BudgetException& e) {
+                            catch (const BudgetException &e)
+                            {
                                 std::cout << e.what() << std::endl;
                             }
-                            catch (const std::exception& e) {
+                            catch (const std::exception &e)
+                            {
                                 std::cout << "Error: " << e.what() << std::endl;
                             }
 
@@ -577,9 +593,9 @@ void Game::handleResize(unsigned int width, unsigned int height)
         m_addAnimalButtonText.setPosition(m_addAnimalButton.getPosition().x + 10,
                                           m_addAnimalButton.getPosition().y + 5);
         m_moveHabitatButton.setPosition(m_buildHabitatButton.getPosition().x,
-                                      m_addAnimalButton.getPosition().y + m_addAnimalButton.getSize().y + 10);
+                                        m_addAnimalButton.getPosition().y + m_addAnimalButton.getSize().y + 10);
         m_moveHabitatButtonText.setPosition(m_moveHabitatButton.getPosition().x + 10,
-                                          m_moveHabitatButton.getPosition().y + 5);
+                                            m_moveHabitatButton.getPosition().y + 5);
         float btnWidth = 120, btnHeight = 40;
         float startX = m_buildHabitatButton.getPosition().x + m_buildHabitatButton.getSize().x + 10;
         float startY = gridAreaHeight + (UI_MARGIN - btnHeight) / 2;
@@ -609,29 +625,35 @@ void Game::handleResize(unsigned int width, unsigned int height)
 void Game::update()
 {
     sf::Vector2i mousePos = sf::Mouse::getPosition(m_window);
-    
-    if (m_isMovingHabitat) {
-        if (m_movingHabitatIndex == -1) {
+
+    if (m_isMovingHabitat)
+    {
+        if (m_movingHabitatIndex == -1)
+        {
             m_statusMessage.setString("Select a habitat to move");
-        } else {
+        }
+        else
+        {
             int newX = mousePos.x / m_tileSize;
             int newY = mousePos.y / m_tileSize;
-            
-            m_statusMessage.setString("Moving habitat to: (" + std::to_string(newX) + 
-                                     "," + std::to_string(newY) + ") - Click to place");
+
+            m_statusMessage.setString("Moving habitat to: (" + std::to_string(newX) +
+                                      "," + std::to_string(newY) + ") - Click to place");
         }
         m_statusMessage.setPosition(10, m_windowHeight - 30);
     }
-    else if (m_isBuildingHabitat) {
+    else if (m_isBuildingHabitat)
+    {
         int cellX = mousePos.x / m_tileSize;
         int cellY = mousePos.y / m_tileSize;
-        
-        m_statusMessage.setString("Building: " + m_selectedHabitatType + 
-                                 " | Grid position: (" + std::to_string(cellX) + 
-                                 "," + std::to_string(cellY) + ")");
+
+        m_statusMessage.setString("Building: " + m_selectedHabitatType +
+                                  " | Grid position: (" + std::to_string(cellX) +
+                                  "," + std::to_string(cellY) + ")");
         m_statusMessage.setPosition(10, m_windowHeight - 30);
     }
-    else {
+    else
+    {
         m_statusMessage.setString("");
     }
 }
@@ -645,24 +667,29 @@ void Game::render()
         {
             m_window.draw(m_tiles[y][x]);
 
-            if (m_isBuildingHabitat) {
-                if (x >= 1 && y >= 1 && x + 2 < m_gridWidth - 1 && y + 2 < m_gridHeight - 1) {
+            if (m_isBuildingHabitat)
+            {
+                if (x >= 1 && y >= 1 && x + 2 < m_gridWidth - 1 && y + 2 < m_gridHeight - 1)
+                {
                     bool isValid = true;
 
-                    for (const auto& habitat : m_habitatBuildings) {
+                    for (const auto &habitat: m_habitatBuildings)
+                    {
                         int hx = std::get<0>(habitat);
                         int hy = std::get<1>(habitat);
 
                         bool overlapsX = (static_cast<int>(x) < hx + 3) && (static_cast<int>(x) + 3 > hx);
                         bool overlapsY = (static_cast<int>(y) < hy + 3) && (static_cast<int>(y) + 3 > hy);
-                        
-                        if (overlapsX && overlapsY) {
+
+                        if (overlapsX && overlapsY)
+                        {
                             isValid = false;
                             break;
                         }
                     }
-                    
-                    if (isValid) {
+
+                    if (isValid)
+                    {
                         sf::RectangleShape highlight;
                         highlight.setSize(sf::Vector2f(m_tileSize, m_tileSize));
                         highlight.setPosition(x * m_tileSize, y * m_tileSize);
@@ -729,14 +756,14 @@ void Game::render()
     {
         m_buildHabitatButtonText.setString("Cancel Habitat");
         m_buildHabitatButton.setFillColor(sf::Color::Red);
-        
+
         sf::Text statusText;
         statusText.setFont(m_font);
         statusText.setCharacterSize(16);
         statusText.setFillColor(sf::Color::Yellow);
         statusText.setString("Click to place " + m_selectedHabitatType + " habitat (or click Cancel)");
-        statusText.setPosition(m_buildHabitatButton.getPosition().x + m_buildHabitatButton.getSize().x + 20, 
-                              m_buildHabitatButton.getPosition().y + 10);
+        statusText.setPosition(m_buildHabitatButton.getPosition().x + m_buildHabitatButton.getSize().x + 20,
+                               m_buildHabitatButton.getPosition().y + 10);
         m_window.draw(statusText);
     }
     else if (m_showHabitatOptions)
@@ -759,25 +786,28 @@ void Game::render()
         m_addAnimalButtonText.setString("Add Animal");
         m_addAnimalButton.setFillColor(sf::Color(100, 200, 100));
     }
-    
+
     if (m_isMovingHabitat)
     {
         m_moveHabitatButtonText.setString("Cancel Move");
         m_moveHabitatButton.setFillColor(sf::Color::Red);
-        
+
         sf::Text moveStatusText;
         moveStatusText.setFont(m_font);
         moveStatusText.setCharacterSize(16);
         moveStatusText.setFillColor(sf::Color::Yellow);
-        
-        if (m_movingHabitatIndex == -1) {
+
+        if (m_movingHabitatIndex == -1)
+        {
             moveStatusText.setString("Select a habitat to move");
-        } else {
+        }
+        else
+        {
             moveStatusText.setString("Click on a new location for the habitat");
-            
+
             int hx, hy;
             std::tie(hx, hy, std::ignore) = m_habitatBuildings[m_movingHabitatIndex];
-            
+
             sf::RectangleShape moveHighlight;
             moveHighlight.setSize(sf::Vector2f(3 * m_tileSize, 3 * m_tileSize));
             moveHighlight.setPosition(hx * m_tileSize, hy * m_tileSize);
@@ -785,51 +815,54 @@ void Game::render()
             moveHighlight.setOutlineColor(sf::Color::Yellow);
             moveHighlight.setOutlineThickness(2);
             m_window.draw(moveHighlight);
-            
+
             sf::Vector2i mousePos = sf::Mouse::getPosition(m_window);
             int newX = mousePos.x / m_tileSize;
             int newY = mousePos.y / m_tileSize;
-            
+
             newX = std::max(1, std::min(newX, static_cast<int>(m_gridWidth) - 4));
             newY = std::max(1, std::min(newY, static_cast<int>(m_gridHeight) - 4));
-            
+
             bool isValidPosition = true;
-            
+
             for (size_t i = 0; i < m_habitatBuildings.size(); i++)
             {
                 if (static_cast<int>(i) == m_movingHabitatIndex) continue;
-                
+
                 int otherX, otherY;
                 std::tie(otherX, otherY, std::ignore) = m_habitatBuildings[i];
-                
+
                 bool overlapsX = (newX < otherX + 3) && (newX + 3 > otherX);
                 bool overlapsY = (newY < otherY + 3) && (newY + 3 > otherY);
-                
+
                 if (overlapsX && overlapsY)
                 {
                     isValidPosition = false;
                     break;
                 }
             }
-            
+
             sf::RectangleShape newPositionPreview;
             newPositionPreview.setSize(sf::Vector2f(3 * m_tileSize, 3 * m_tileSize));
             newPositionPreview.setPosition(newX * m_tileSize, newY * m_tileSize);
-            
-            if (isValidPosition) {
+
+            if (isValidPosition)
+            {
                 newPositionPreview.setFillColor(sf::Color(0, 255, 0, 80));
                 newPositionPreview.setOutlineColor(sf::Color::Green);
-            } else {
+            }
+            else
+            {
                 newPositionPreview.setFillColor(sf::Color(255, 0, 0, 80));
                 newPositionPreview.setOutlineColor(sf::Color::Red);
             }
-            
+
             newPositionPreview.setOutlineThickness(2);
             m_window.draw(newPositionPreview);
         }
-        
+
         moveStatusText.setPosition(m_moveHabitatButton.getPosition().x + m_moveHabitatButton.getSize().x + 20,
-                                 m_moveHabitatButton.getPosition().y + 10);
+                                   m_moveHabitatButton.getPosition().y + 10);
         m_window.draw(moveStatusText);
     }
     else
@@ -837,7 +870,7 @@ void Game::render()
         m_moveHabitatButtonText.setString("Move Habitat");
         m_moveHabitatButton.setFillColor(sf::Color(200, 100, 200));
     }
-    
+
     m_window.draw(m_buildHabitatButton);
     m_window.draw(m_buildHabitatButtonText);
     m_window.draw(m_addAnimalButton);
@@ -865,10 +898,11 @@ void Game::render()
     budgetText.setPosition(m_windowWidth - 200, m_gridHeight * m_tileSize + 10);
     m_window.draw(budgetText);
 
-    if (!m_statusMessage.getString().isEmpty()) {
+    if (!m_statusMessage.getString().isEmpty())
+    {
         m_window.draw(m_statusMessage);
     }
-    
+
     m_window.display();
 }
 
@@ -881,4 +915,3 @@ void Game::run()
         render();
     }
 }
-

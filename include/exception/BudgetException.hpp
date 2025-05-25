@@ -4,9 +4,10 @@
 #include "ZooExceptions.hpp"
 #include <string>
 
-class BudgetException : public ZooException {
+class BudgetException : public ZooException
+{
 public:
-    explicit BudgetException(const std::string& message);
+    explicit BudgetException(const std::string &message);
 };
 
 #endif // BUDGET_EXCEPTION_H
