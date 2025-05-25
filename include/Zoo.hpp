@@ -31,6 +31,8 @@ public:
     void setVisitorCount(int visitor_count);
     [[nodiscard]] bool getIsOpen() const;
     void setIsOpen(bool is_open);
+    void moveHabitat(size_t habitatIndex, int newX, int newY);
+    
     [[nodiscard]] float getBudget() const;
     void setBudget(float newBudget);
     bool spendMoney(float amount);

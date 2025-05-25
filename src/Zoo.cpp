@@ -189,6 +189,12 @@ int Zoo::findHabitatAt(int gridX, int gridY) const {
     }
     return -1;
 }
+            
+            void Zoo::moveHabitat(size_t habitatIndex, int newX, int newY) {
+                if (habitatIndex < m_habitats.size()) {
+                    m_habitats[habitatIndex].setPosition(newX, newY);
+                }
+            }
 
 bool Zoo::addAnimalTo(int habitatIndex, const std::string& animalType)
 {

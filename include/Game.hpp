@@ -53,5 +53,13 @@ private:
     std::vector<sf::Text> m_animalOptionTexts;
     std::map<std::string, sf::Texture> m_animalTextures;
     std::vector<std::vector<std::string>> m_animalsInHabitat;
+    
+    // Habitat move functionality
+    sf::RectangleShape m_moveHabitatButton;
+    sf::Text m_moveHabitatButtonText;
+    bool m_isMovingHabitat;
+    int m_movingHabitatIndex;
+    int m_originalHabitatX;
+    int m_originalHabitatY;
     Zoo m_zoo;
 };
