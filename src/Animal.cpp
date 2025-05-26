@@ -165,6 +165,7 @@ std::ostream &operator<<(std::ostream &os, const Animal &animal)
     return os;
 }
 
+
 std::vector<std::string> Animal::s_animalNames = {
     "Luna", "Max", "Rocky", "Bella", "Charlie", "Lucy", "Leo", "Daisy", "Simba", "Nala",
     "Jack", "Molly", "Duke", "Sadie", "Teddy", "Ruby", "Oliver", "Rosie", "Milo", "Lola",

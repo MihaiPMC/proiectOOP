@@ -235,77 +235,7 @@ std::ostream &operator<<(std::ostream &os, const Habitat &habitat)
     return os;
 }
 
-std::map<std::string, std::vector<std::string>> Habitat::s_habitatSpecies = {
-    {"Forest", {"Bear", "Wolf", "Fox", "Deer", "Owl", "bear", "wolf", "fox", "deer", "owl"}},
-    {"Desert", {"Camel", "Scorpion", "Rattlesnake", "Coyote", "Lizard", "camel", "scorpion", "rattlesnake", "coyote", "lizard"}},
-    {"Ocean", {"Dolphin", "Shark", "Octopus", "Penguin", "Sea Turtle", "dolphin", "shark", "octopus", "penguin", "sea turtle", "seaturtle"}},
-    {"Savanna", {"Lion", "Elephant", "Zebra", "Giraffe", "Cheetah", "lion", "elephant", "zebra", "giraffe", "cheetah"}},
-    {"Mountain", {"Eagle", "Mountain Lion", "Goat", "Yak", "Snow Leopard", "eagle", "mountain lion", "goat", "yak", "snow leopard"}}
-};
 
-std::map<std::string, std::vector<std::string>> Habitat::getHabitatSpecies()
-{
-    return s_habitatSpecies;
-}
-
-std::string Habitat::selectHabitatType()
-{
-    int habitatType;
-    do
-    {
-        std::cout << "What habitat do you want to add? 1. Forest 2. Desert 3. Ocean 4. Savanna 5. Mountain" << std::endl;
-        std::cin >> habitatType;
-        if (habitatType < 1 || habitatType > 5)
-            std::cout << "Invalid habitat type! Please choose again." << std::endl;
-    } while (habitatType < 1 || habitatType > 5);
-    switch (habitatType)
-    {
-        case 1: return "Forest";
-        case 2: return "Desert";
-        case 3: return "Ocean";
-        case 4: return "Savanna";
-        case 5: return "Mountain";
-        default: return "Forest";
-    }
-}
-
-void Habitat::addRandomAnimals(int count, float &budget)
-{
-    if (count < 0 || count > 5)
-    {
-        std::cout << "Invalid number of animals! Using 0 instead." << std::endl;
-        return;
-    }
-    std::cout << "Animal price is $1000." << std::endl;
-    for (int j = 0; j < count; j++)
-    {
-        if (budget < 1000)
-        {
-            std::cout << "Not enough budget to add more animals!" << std::endl;
-            break;
-        }
-        std::cout << "Available species for " << m_type << " habitat:" << std::endl;
-        const std::vector<std::string> &species = s_habitatSpecies[m_type];
-        for (size_t k = 0; k < species.size(); k++)
-        {
-            std::cout << (k + 1) << ". " << species[k] << std::endl;
-        }
-        int speciesChoice;
-        std::cout << "Choose a species (1-" << species.size() << "): ";
-        std::cin >> speciesChoice;
-        if (speciesChoice < 1 || speciesChoice > static_cast<int>(species.size()))
-        {
-            std::cout << "Invalid choice. Defaulting to first species." << std::endl;
-            speciesChoice = 1;
-        }
-        auto newAnimal = Animal::createRandomAnimal(species[speciesChoice - 1]);
-        addAnimal(newAnimal);
-        budget -= newAnimal->getPrice();
-        std::cout << "Added " << newAnimal->getName() << " the " << newAnimal->getSpecies()
-                  << " to " << m_type << " habitat!" << std::endl;
-        std::cout << "Remaining budget: $" << budget << std::endl;
-    }
-}
 
 void Habitat::setPosition(int x, int y)
 {
