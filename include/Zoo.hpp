@@ -45,7 +45,7 @@ public:
 
     void moveHabitat(size_t habitatIndex, int newX, int newY);
 
-    [[nodiscard]] int getVisitorCount() const;
+    [[nodiscard]] int getVisitorCount() const;//.
 
     void setVisitorCount(int visitor_count);
 
