@@ -120,8 +120,8 @@ Game::Game()
                                          m_buildHabitatButton.getPosition().y + 5);
     m_addAnimalButton.setSize(sf::Vector2f(150, 40));
     m_addAnimalButton.setFillColor(sf::Color(100, 200, 100));
-    m_addAnimalButton.setPosition(m_buildHabitatButton.getPosition().x,
-                                  m_buildHabitatButton.getPosition().y + m_buildHabitatButton.getSize().y + 10);
+    m_addAnimalButton.setPosition(m_buildHabitatButton.getPosition().x + m_buildHabitatButton.getSize().x + 10,
+                                  m_buildHabitatButton.getPosition().y);
     m_addAnimalButtonText.setFont(m_font);
     m_addAnimalButtonText.setCharacterSize(20);
     m_addAnimalButtonText.setFillColor(sf::Color::White);
@@ -130,8 +130,8 @@ Game::Game()
 
     m_moveHabitatButton.setSize(sf::Vector2f(150, 40));
     m_moveHabitatButton.setFillColor(sf::Color(200, 100, 200));
-    m_moveHabitatButton.setPosition(m_buildHabitatButton.getPosition().x,
-                                    m_addAnimalButton.getPosition().y + m_addAnimalButton.getSize().y + 10);
+    m_moveHabitatButton.setPosition(m_addAnimalButton.getPosition().x + m_addAnimalButton.getSize().x + 10,
+                                    m_buildHabitatButton.getPosition().y);
     m_moveHabitatButtonText.setFont(m_font);
     m_moveHabitatButtonText.setCharacterSize(20);
     m_moveHabitatButtonText.setFillColor(sf::Color::White);
@@ -139,19 +139,17 @@ Game::Game()
     m_moveHabitatButtonText.setPosition(m_moveHabitatButton.getPosition().x + 10,
                                         m_moveHabitatButton.getPosition().y + 5);
 
-    // Build path button
     m_buildPathButton.setSize(sf::Vector2f(150, 40));
-    m_buildPathButton.setFillColor(sf::Color(153, 102, 51)); // Brown color for paths
-    m_buildPathButton.setPosition(m_moveHabitatButton.getPosition().x,
-                                  m_moveHabitatButton.getPosition().y + m_moveHabitatButton.getSize().y + 10);
+    m_buildPathButton.setFillColor(sf::Color(153, 102, 51));
+    m_buildPathButton.setPosition(m_moveHabitatButton.getPosition().x + m_moveHabitatButton.getSize().x + 10,
+                                  m_buildHabitatButton.getPosition().y);
     m_buildPathButtonText.setFont(m_font);
     m_buildPathButtonText.setCharacterSize(20);
     m_buildPathButtonText.setFillColor(sf::Color::White);
     m_buildPathButtonText.setString("Build Path");
     m_buildPathButtonText.setPosition(m_buildPathButton.getPosition().x + 10,
-                                     m_buildPathButton.getPosition().y + 5);
+                                      m_buildPathButton.getPosition().y + 5);
 
-    // Load path texture
     loadTexture(m_pathTexture, "images/path.png", "../images/path.png", sf::Color(153, 102, 51));
 
     m_statusMessage.setFont(m_font);
@@ -159,8 +157,8 @@ Game::Game()
     m_statusMessage.setFillColor(sf::Color::Yellow);
     std::vector<std::string> options = {"Desert", "Forest", "Mountain", "Ocean", "Savanna"};
     float btnWidth = 120, btnHeight = 40;
-    float startX = m_buildHabitatButton.getPosition().x + m_buildHabitatButton.getSize().x + 10;
-    float startY = gridAreaHeight + (UI_MARGIN - btnHeight) / 2;
+    float startX = m_buildHabitatButton.getPosition().x;
+    float startY = m_buildHabitatButton.getPosition().y + m_buildHabitatButton.getSize().y + 10;
     for (size_t i = 0; i < options.size(); i++)
     {
         sf::RectangleShape optionBtn;
@@ -329,7 +327,8 @@ void Game::processEvents()
                 m_movingHabitatIndex = -1;
                 std::cout << "Select a habitat to move." << std::endl;
             }
-            else if (!m_isAddingAnimal && !m_isBuildingHabitat && !m_showHabitatOptions && !m_isMovingHabitat && !m_isBuildingPath)
+            else if (!m_isAddingAnimal && !m_isBuildingHabitat && !m_showHabitatOptions && !m_isMovingHabitat && !
+                     m_isBuildingPath)
             {
                 if (m_buildHabitatButton.getGlobalBounds().contains(mousePos.x, mousePos.y))
                     m_showHabitatOptions = true;
@@ -390,6 +389,26 @@ void Game::processEvents()
                     {
                         if (m_zoo.buildHabitatAt(m_selectedHabitatType, cellX, cellY, m_gridWidth, m_gridHeight))
                         {
+                            for (int hx = cellX; hx < cellX + 3; hx++)
+                            {
+                                for (int hy = cellY; hy < cellY + 3; hy++)
+                                {
+                                    auto pathIt = std::remove_if(m_pathTiles.begin(), m_pathTiles.end(),
+                                                                 [hx, hy](const auto &path)
+                                                                 {
+                                                                     return std::get<0>(path) == hx && std::get<1>(path)
+                                                                            == hy;
+                                                                 });
+
+                                    if (pathIt != m_pathTiles.end())
+                                    {
+                                        std::cout << "Removed path at (" << hx << "," << hy
+                                                << ") for new habitat" << std::endl;
+                                        m_pathTiles.erase(pathIt, m_pathTiles.end());
+                                    }
+                                }
+                            }
+
                             std::string builtType = m_selectedHabitatType;
                             m_habitatBuildings.push_back(std::make_tuple(cellX, cellY, m_selectedHabitatType));
                             m_animalsInHabitat.push_back({});
@@ -474,6 +493,26 @@ void Game::processEvents()
                         std::string type;
                         std::tie(oldX, oldY, type) = m_habitatBuildings[m_movingHabitatIndex];
 
+                        for (int hx = newX; hx < newX + 3; hx++)
+                        {
+                            for (int hy = newY; hy < newY + 3; hy++)
+                            {
+                                auto pathIt = std::remove_if(m_pathTiles.begin(), m_pathTiles.end(),
+                                                             [hx, hy](const auto &path)
+                                                             {
+                                                                 return std::get<0>(path) == hx && std::get<1>(path) ==
+                                                                        hy;
+                                                             });
+
+                                if (pathIt != m_pathTiles.end())
+                                {
+                                    std::cout << "Removed path at (" << hx << "," << hy
+                                            << ") for moved habitat" << std::endl;
+                                    m_pathTiles.erase(pathIt, m_pathTiles.end());
+                                }
+                            }
+                        }
+
                         m_habitatBuildings[m_movingHabitatIndex] = std::make_tuple(newX, newY, type);
 
                         if (m_movingHabitatIndex >= 0 && static_cast<size_t>(m_movingHabitatIndex) < m_zoo.getHabitats()
@@ -524,8 +563,8 @@ void Game::processEvents()
                         m_animalOptionTexts.clear();
 
                         float optWidth = 120, optHeight = 40;
-                        float optStartX = m_addAnimalButton.getPosition().x + m_addAnimalButton.getSize().x + 10;
-                        float optStartY = m_addAnimalButton.getPosition().y;
+                        float optStartX = m_addAnimalButton.getPosition().x;
+                        float optStartY = m_addAnimalButton.getPosition().y + m_addAnimalButton.getSize().y + 10;
 
                         for (size_t j = 0; j < allowed.size(); j++)
                         {
@@ -627,21 +666,21 @@ void Game::handleResize(unsigned int width, unsigned int height)
         m_buildHabitatButton.setPosition(10, gridAreaHeight + (UI_MARGIN - m_buildHabitatButton.getSize().y) / 2);
         m_buildHabitatButtonText.setPosition(m_buildHabitatButton.getPosition().x + 10,
                                              m_buildHabitatButton.getPosition().y + 5);
-        m_addAnimalButton.setPosition(m_buildHabitatButton.getPosition().x,
-                                      m_buildHabitatButton.getPosition().y + m_buildHabitatButton.getSize().y + 10);
+        m_addAnimalButton.setPosition(m_buildHabitatButton.getPosition().x + m_buildHabitatButton.getSize().x + 10,
+                                      m_buildHabitatButton.getPosition().y);
         m_addAnimalButtonText.setPosition(m_addAnimalButton.getPosition().x + 10,
                                           m_addAnimalButton.getPosition().y + 5);
-        m_moveHabitatButton.setPosition(m_buildHabitatButton.getPosition().x,
-                                        m_addAnimalButton.getPosition().y + m_addAnimalButton.getSize().y + 10);
+        m_moveHabitatButton.setPosition(m_addAnimalButton.getPosition().x + m_addAnimalButton.getSize().x + 10,
+                                        m_buildHabitatButton.getPosition().y);
         m_moveHabitatButtonText.setPosition(m_moveHabitatButton.getPosition().x + 10,
                                             m_moveHabitatButton.getPosition().y + 5);
-        m_buildPathButton.setPosition(m_buildHabitatButton.getPosition().x,
-                                      m_moveHabitatButton.getPosition().y + m_moveHabitatButton.getSize().y + 10);
+        m_buildPathButton.setPosition(m_moveHabitatButton.getPosition().x + m_moveHabitatButton.getSize().x + 10,
+                                      m_buildHabitatButton.getPosition().y);
         m_buildPathButtonText.setPosition(m_buildPathButton.getPosition().x + 10,
                                           m_buildPathButton.getPosition().y + 5);
         float btnWidth = 120, btnHeight = 40;
-        float startX = m_buildHabitatButton.getPosition().x + m_buildHabitatButton.getSize().x + 10;
-        float startY = gridAreaHeight + (UI_MARGIN - btnHeight) / 2;
+        float startX = m_buildHabitatButton.getPosition().x;
+        float startY = m_buildHabitatButton.getPosition().y + m_buildHabitatButton.getSize().y + 10;
         for (size_t i = 0; i < m_habitatOptionButtons.size(); i++)
         {
             m_habitatOptionButtons[i].setSize(sf::Vector2f(btnWidth, btnHeight));
@@ -652,8 +691,8 @@ void Game::handleResize(unsigned int width, unsigned int height)
         if (m_showAnimalOptionsForAnimal)
         {
             float optWidth = 120, optHeight = 40;
-            float optStartX = m_addAnimalButton.getPosition().x + m_addAnimalButton.getSize().x + 10;
-            float optStartY = m_addAnimalButton.getPosition().y;
+            float optStartX = m_addAnimalButton.getPosition().x;
+            float optStartY = m_addAnimalButton.getPosition().y + m_addAnimalButton.getSize().y + 10;
             for (size_t i = 0; i < m_animalOptionButtons.size(); i++)
             {
                 m_animalOptionButtons[i].setSize(sf::Vector2f(optWidth, optHeight));
@@ -701,23 +740,19 @@ void Game::update()
         int cellY = mousePos.y / m_tileSize;
 
         m_statusMessage.setString("Building path | Grid position: (" + std::to_string(cellX) +
-                                 "," + std::to_string(cellY) + ")");
+                                  "," + std::to_string(cellY) + ")");
         m_statusMessage.setPosition(10, m_windowHeight - 30);
 
-        // Continuous path building when mouse button is held
         if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
         {
-            // Check if click is within the grid and not on the perimeter
             if (cellX >= 1 && cellY >= 1 && cellX < static_cast<int>(m_gridWidth) - 1 &&
                 cellY < static_cast<int>(m_gridHeight) - 1)
             {
-                // Only build if we're at a new position
                 if (cellX != m_lastPathX || cellY != m_lastPathY)
                 {
                     bool canBuildPath = true;
 
-                    // Check if spot is already occupied by a habitat
-                    for (const auto& habitat : m_habitatBuildings)
+                    for (const auto &habitat: m_habitatBuildings)
                     {
                         int hx = std::get<0>(habitat);
                         int hy = std::get<1>(habitat);
@@ -732,8 +767,7 @@ void Game::update()
                         }
                     }
 
-                    // Check if spot already has a path
-                    for (const auto& path : m_pathTiles)
+                    for (const auto &path: m_pathTiles)
                     {
                         if (std::get<0>(path) == cellX && std::get<1>(path) == cellY)
                         {
@@ -753,7 +787,6 @@ void Game::update()
         }
         else
         {
-            // Reset last position when not holding mouse button
             m_lastPathX = -1;
             m_lastPathY = -1;
         }
@@ -805,21 +838,19 @@ void Game::render()
                 }
             }
 
-                                    // Highlight potential path locations when in path building mode
-                                    if (m_isBuildingPath)
-                                    {
-                                        sf::Vector2i mousePos = sf::Mouse::getPosition(m_window);
-                                        int cellX = mousePos.x / m_tileSize;
-                                        int cellY = mousePos.y / m_tileSize;
+            if (m_isBuildingPath)
+            {
+                sf::Vector2i mousePos = sf::Mouse::getPosition(m_window);
+                int cellX = mousePos.x / m_tileSize;
+                int cellY = mousePos.y / m_tileSize;
 
-                                        if (cellX >= 1 && cellY >= 1 && cellX < static_cast<int>(m_gridWidth) - 1 &&
-                                            cellY < static_cast<int>(m_gridHeight) - 1)
-                                        {
-                                            bool canBuildPath = true;
+                if (cellX >= 1 && cellY >= 1 && cellX < static_cast<int>(m_gridWidth) - 1 &&
+                    cellY < static_cast<int>(m_gridHeight) - 1)
+                {
+                    bool canBuildPath = true;
 
-                                            // Check if spot is already occupied by a habitat
-                                            for (const auto& habitat : m_habitatBuildings)
-                                            {
+                    for (const auto &habitat: m_habitatBuildings)
+                    {
                         int hx = std::get<0>(habitat);
                         int hy = std::get<1>(habitat);
 
@@ -829,41 +860,44 @@ void Game::render()
                         if (overlapsX && overlapsY)
                         {
                             canBuildPath = false;
+                            std::cout << "Cannot build path - location is occupied by a habitat" << std::endl;
                             break;
                         }
-                                            }
+                    }
 
-                                            // Check if spot already has a path
-                                            for (const auto& path : m_pathTiles)
-                                            {
+                    for (const auto &path: m_pathTiles)
+                    {
                         if (std::get<0>(path) == cellX && std::get<1>(path) == cellY)
                         {
                             canBuildPath = false;
                             break;
                         }
-                                            }
+                    }
 
-                                            sf::RectangleShape pathHighlight;
-                                            pathHighlight.setSize(sf::Vector2f(m_tileSize, m_tileSize));
-                                            pathHighlight.setPosition(cellX * m_tileSize, cellY * m_tileSize);
+                    sf::RectangleShape pathHighlight;
+                    pathHighlight.setSize(sf::Vector2f(m_tileSize, m_tileSize));
+                    pathHighlight.setPosition(cellX * m_tileSize, cellY * m_tileSize);
 
-                                            if (canBuildPath) {
-                        pathHighlight.setFillColor(sf::Color(153, 102, 51, 80)); // Brown with transparency
-                        pathHighlight.setOutlineColor(sf::Color(102, 51, 0));    // Darker brown
-                                            } else {
-                        pathHighlight.setFillColor(sf::Color(255, 0, 0, 80));    // Red with transparency
-                        pathHighlight.setOutlineColor(sf::Color(200, 0, 0));     // Darker red
-                                            }
+                    if (canBuildPath)
+                    {
+                        pathHighlight.setFillColor(sf::Color(153, 102, 51, 80));
+                        pathHighlight.setOutlineColor(sf::Color(102, 51, 0));
+                    }
+                    else
+                    {
+                        pathHighlight.setFillColor(sf::Color(255, 0, 0, 80));
+                        pathHighlight.setOutlineColor(sf::Color(200, 0, 0));
+                    }
 
-                                            pathHighlight.setOutlineThickness(2);
-                                            m_window.draw(pathHighlight);
-                                        }
-                                    }
+                    pathHighlight.setOutlineThickness(2);
+                    m_window.draw(pathHighlight);
+                }
+            }
         }
     }
 
-            // Draw paths
-            for (const auto& path : m_pathTiles) {
+    for (const auto &path: m_pathTiles)
+    {
         int x = std::get<0>(path);
         int y = std::get<1>(path);
 
@@ -871,9 +905,9 @@ void Game::render()
         pathSprite.setTexture(m_pathTexture);
         pathSprite.setPosition(x * m_tileSize, y * m_tileSize);
         pathSprite.setScale(static_cast<float>(m_tileSize) / pathSprite.getTexture()->getSize().x,
-                          static_cast<float>(m_tileSize) / pathSprite.getTexture()->getSize().y);
+                            static_cast<float>(m_tileSize) / pathSprite.getTexture()->getSize().y);
         m_window.draw(pathSprite);
-            }
+    }
 
     for (auto &b: m_habitatBuildings)
     {
@@ -936,8 +970,7 @@ void Game::render()
         statusText.setCharacterSize(16);
         statusText.setFillColor(sf::Color::Yellow);
         statusText.setString("Click to place " + m_selectedHabitatType + " habitat (or click Cancel)");
-        statusText.setPosition(m_buildHabitatButton.getPosition().x + m_buildHabitatButton.getSize().x + 20,
-                               m_buildHabitatButton.getPosition().y + 10);
+        statusText.setPosition(10, m_buildHabitatButton.getPosition().y + m_buildHabitatButton.getSize().y + 60);
         m_window.draw(statusText);
     }
     else if (m_showHabitatOptions)
@@ -1035,8 +1068,8 @@ void Game::render()
             m_window.draw(newPositionPreview);
         }
 
-        moveStatusText.setPosition(m_moveHabitatButton.getPosition().x + m_moveHabitatButton.getSize().x + 20,
-                                   m_moveHabitatButton.getPosition().y + 10);
+        moveStatusText.setPosition(m_moveHabitatButton.getPosition().x,
+                                   m_moveHabitatButton.getPosition().y + m_moveHabitatButton.getSize().y + 10);
         m_window.draw(moveStatusText);
     }
     else
@@ -1055,8 +1088,8 @@ void Game::render()
         pathStatusText.setCharacterSize(16);
         pathStatusText.setFillColor(sf::Color::Yellow);
         pathStatusText.setString("Click on grid cells to build paths");
-        pathStatusText.setPosition(m_buildPathButton.getPosition().x + m_buildPathButton.getSize().x + 20,
-                                  m_buildPathButton.getPosition().y + 10);
+        pathStatusText.setPosition(m_buildPathButton.getPosition().x,
+                                   m_buildPathButton.getPosition().y + m_buildPathButton.getSize().y + 10);
         m_window.draw(pathStatusText);
     }
     else
