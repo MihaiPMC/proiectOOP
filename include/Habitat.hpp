@@ -51,6 +51,7 @@ public:
     static std::vector<std::string> getAllowedAnimals(const std::string& habitatType);
     void demonstrateSpecificBehavior(const std::shared_ptr<Animal>& animal) const;
     float calculateVisitorSatisfaction(int visitorCount) const;
+    static std::unordered_map<std::string, std::vector<std::string>> s_habitatSpecies;
 
     friend std::ostream &operator<<(std::ostream &os, const Habitat &habitat);
 };

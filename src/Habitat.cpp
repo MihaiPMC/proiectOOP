@@ -1,6 +1,17 @@
 #include "../include/Habitat.hpp"
 #include "../include/exception/HabitatException.hpp"
 #include "../include/exception/AnimalException.hpp"
+#include <unordered_map>
+#include <vector>
+
+// Define static member variable
+std::unordered_map<std::string, std::vector<std::string>> Habitat::s_habitatSpecies = {
+    {"Desert", {"camel", "coyote", "scorpion"}},
+    {"Forest", {"bear", "fox", "wolf"}},
+    {"Mountain", {"eagle", "goat", "yak"}},
+    {"Ocean", {"dolphin", "octopus", "seaturtle"}},
+    {"Savanna", {"elephant", "lion", "zebra"}}
+};
 
 Habitat::Habitat(const std::string &type, const std::vector<std::shared_ptr<Animal>> &animals, int capacity, float cleanlinessLevel, float price)
     : m_type(type), m_animals(animals), m_capacity(capacity), m_cleanlinessLevel(cleanlinessLevel), m_price(price), m_gridX(-1), m_gridY(-1)
