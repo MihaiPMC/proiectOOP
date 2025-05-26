@@ -13,18 +13,46 @@ std::map<std::string, std::vector<std::string>> Habitat::s_habitatSpecies = {
     {"Savanna", {"elephant", "lion", "zebra"}}
 };
 
-Habitat::Habitat(const std::string &type, const std::vector<std::shared_ptr<Animal>> &animals, int capacity, float cleanlinessLevel, float price)
+    /**
+     * @brief Constructor for creating a new habitat
+     * 
+     * Initializes a habitat with specified type, animals, and properties.
+     * Grid position is set to (-1,-1) indicating it's not placed on the grid yet.
+     * 
+     * @param type The type of habitat (Desert, Forest, etc.)
+     * @param animals Initial collection of animals for the habitat
+     * @param capacity Maximum number of animals the habitat can contain
+     * @param cleanlinessLevel Initial cleanliness level (0.0 to 1.0)
+     * @param price Cost to build the habitat
+     */
+    Habitat::Habitat(const std::string &type, const std::vector<std::shared_ptr<Animal>> &animals, int capacity, float cleanlinessLevel, float price)
     : m_type(type), m_animals(animals), m_capacity(capacity), m_cleanlinessLevel(cleanlinessLevel), m_price(price), m_gridX(-1), m_gridY(-1)
-{
-}
-
-Habitat::Habitat(const Habitat &other)
+    {
+    }
+    
+    /**
+     * @brief Copy constructor
+     * 
+     * Creates a new habitat by copying all attributes from another habitat.
+     * Note: This performs a shallow copy of the animal pointers.
+     * 
+     * @param other The habitat to copy from
+     */
+    Habitat::Habitat(const Habitat &other)
     : m_type(other.m_type), m_animals(other.m_animals), m_capacity(other.m_capacity),
       m_cleanlinessLevel(other.m_cleanlinessLevel), m_price(other.m_price),
       m_gridX(other.m_gridX), m_gridY(other.m_gridY)
-{
-}
-
+    {
+    }
+    
+    /**
+     * @brief Move constructor
+     * 
+     * Creates a new habitat by moving attributes from another habitat.
+     * This is more efficient than copying when the source habitat is temporary.
+     * 
+     * @param other The habitat to move from
+     */
 Habitat::Habitat(Habitat &&other) noexcept
     : m_type(std::move(other.m_type)), m_animals(std::move(other.m_animals)),
       m_capacity(other.m_capacity), m_cleanlinessLevel(other.m_cleanlinessLevel), m_price(other.m_price),
@@ -290,15 +318,39 @@ void Habitat::showSpecificBehaviors() const {
             }
         }
         
+        /**
+         * @brief Draws a highlight effect around the habitat
+         * 
+         * Creates a semi-transparent colored rectangle with an outline to highlight
+         * the habitat on the grid. Used to indicate selection or special status.
+         * Does nothing if the habitat doesn't have a valid grid position.
+         * 
+         * @param window SFML render window to draw on
+         * @param tileSize Size of each tile in pixels
+         * @param color Color to use for the highlight
+         * @param outlineThickness Thickness of the highlight outline in pixels
+         */
         void Habitat::highlightHabitat(sf::RenderWindow& window, int tileSize, const sf::Color& color, float outlineThickness) const {
+            // Don't highlight if habitat is not placed on the grid
             if (m_gridX == -1 || m_gridY == -1)
                 return;
                 
+            // Create a rectangle shape for the highlight
             sf::RectangleShape highlight;
+            
+            // Set size to cover the entire 3x3 habitat area
             highlight.setSize(sf::Vector2f(3 * tileSize, 3 * tileSize));
+            
+            // Position the highlight at the habitat's grid location
             highlight.setPosition(m_gridX * tileSize, m_gridY * tileSize);
+            
+            // Set a semi-transparent fill color (80 alpha)
             highlight.setFillColor(sf::Color(color.r, color.g, color.b, 80));
+            
+            // Set the outline color to the full opacity version of the color
             highlight.setOutlineColor(color);
+            
+            // Set the thickness of the outline
             highlight.setOutlineThickness(outlineThickness);
             window.draw(highlight);
         }

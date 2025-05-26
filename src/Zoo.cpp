@@ -156,23 +156,44 @@ bool Zoo::canBuildAt(int gridX, int gridY, int gridWidth, int gridHeight) const
     return true;
 }
 
+/**
+ * @brief Build a new habitat at a specific position on the grid
+ * 
+ * This method attempts to build a habitat of the specified type at the given
+ * grid coordinates. It checks if the position is valid, if the zoo has enough
+ * budget, and then creates and places the habitat.
+ *
+ * @param type The type of habitat to build (Desert, Forest, Mountain, Ocean, Savanna)
+ * @param gridX X-coordinate on the grid
+ * @param gridY Y-coordinate on the grid
+ * @param gridWidth Width of the entire zoo grid
+ * @param gridHeight Height of the entire zoo grid
+ * @return true if habitat was successfully built, false otherwise
+ * @throws HabitatException if the position is invalid
+ * @throws BudgetException if there's not enough money to build the habitat
+ */
 bool Zoo::buildHabitatAt(const std::string &type, int gridX, int gridY, int gridWidth, int gridHeight)
 {
     std::cout << "Attempting to build " << type << " habitat at position (" << gridX << "," << gridY << ")" <<
             std::endl;
 
+    // Check if the position is valid for building
     if (!canBuildAt(gridX, gridY, gridWidth, gridHeight))
     {
         throw HabitatException("Cannot place habitat at position (" + std::to_string(gridX) +
                                "," + std::to_string(gridY) + ") - invalid location");
     }
 
+    // Create a new habitat of the specified type
     Habitat newHabitat(type, {});
     float habitatPrice = newHabitat.getPrice();
 
     try
     {
+        // Attempt to spend the required money
         spendMoney(habitatPrice);
+        
+        // Set the habitat's position and add it to the zoo
         newHabitat.setPosition(gridX, gridY);
         m_habitats.push_back(newHabitat);
 
@@ -181,6 +202,7 @@ bool Zoo::buildHabitatAt(const std::string &type, int gridX, int gridY, int grid
         return true;
     } catch (const BudgetException &e)
     {
+        // If there's not enough budget, report the error
         std::cout << e.what() << std::endl;
         return false;
     }
@@ -350,13 +372,29 @@ void Zoo::showTutorial(sf::RenderWindow& window, sf::Font& font)
     }
 }
 
+/**
+ * @brief Render all habitats and their animals in the zoo
+ * 
+ * This method iterates through all habitats in the zoo and renders each one,
+ * along with the animals it contains. Only habitats that have been placed on
+ * the grid (with valid coordinates) are rendered.
+ *
+ * @param window SFML render window to draw on
+ * @param tileSize Size of each tile in pixels
+ * @param habitatTextures Map of habitat textures keyed by habitat type
+ * @param animalTextures Map of animal textures keyed by species name
+ */
 void Zoo::renderHabitats(sf::RenderWindow& window, int tileSize, const std::map<std::string, sf::Texture>& habitatTextures, 
                          const std::map<std::string, sf::Texture>& animalTextures) const
 {
+    // Iterate through all habitats in the zoo
     for (const auto& habitat : m_habitats) {
+        // Only render habitats that have been placed on the grid
         if (habitat.getGridX() != -1) {
+            // Find the appropriate texture for this habitat type
             auto it = habitatTextures.find(habitat.getType());
             if (it != habitatTextures.end()) {
+                // Render the habitat and its animals
                 habitat.renderHabitat(window, tileSize, it->second);
                 habitat.renderAnimals(window, tileSize, animalTextures);
             }
@@ -364,9 +402,22 @@ void Zoo::renderHabitats(sf::RenderWindow& window, int tileSize, const std::map<
     }
 }
 
+/**
+ * @brief Highlight a specific habitat in the zoo
+ * 
+ * This method applies a visual highlight effect to a habitat at the specified index.
+ * Used to indicate selection, targeting, or special status.
+ *
+ * @param window SFML render window to draw on
+ * @param tileSize Size of each tile in pixels
+ * @param index Index of the habitat to highlight
+ * @param color Color to use for the highlight
+ */
 void Zoo::highlightHabitatAt(sf::RenderWindow& window, int tileSize, int index, const sf::Color& color) const
 {
+    // Check if the index is valid
     if (index >= 0 && index < static_cast<int>(m_habitats.size())) {
+        // Apply the highlight effect to the habitat
         m_habitats[index].highlightHabitat(window, tileSize, color, 2.0f);
     }
 }

@@ -9,55 +9,62 @@
 #include <sstream>
 static const int UI_MARGIN = 50;
 
+/**
+ * @brief Constructor for the Game class
+ * 
+ * Initializes all game components, including the window, textures, UI elements,
+ * and the zoo object. Sets up the game state and prepares the grid for habitat placement.
+ * This is the main entry point for the zoo tycoon game.
+ */
 Game::Game()
-    : m_window(),
-      m_windowWidth(1800),
-      m_windowHeight(1350),
-      m_font(),
-      m_zooName(),
-      m_nameEntered(false),
-      m_prompt(),
-      m_inputText(),
-      m_gridWidth(40),
-      m_gridHeight(25),
-      m_tileSize(0),
-      m_grassTexture(),
-      m_wallTexture(),
-      m_tiles(),
-      m_isBuildingHabitat(false),
-      m_showHabitatOptions(false),
-      m_selectedHabitatType(""),
-      m_habitatTextures(),
-      m_buildHabitatButton(),
-      m_buildHabitatButtonText(),
-      m_habitatOptionButtons(),
-      m_habitatOptionTexts(),
-      m_habitatBuildings(),
-      m_addAnimalButton(),
-      m_addAnimalButtonText(),
-      m_isAddingAnimal(false),
-      m_showAnimalOptionsForAnimal(false),
-      m_statusMessage(),
-      m_selectedHabitatIndex(-1),
-      m_selectedAnimalType(""),
-      m_animalOptionButtons(),
-      m_animalOptionTexts(),
-      m_animalTextures(),
-      m_animalsInHabitat(),
-      m_moveHabitatButton(),
-      m_moveHabitatButtonText(),
-      m_isMovingHabitat(false),
-      m_movingHabitatIndex(-1),
-      m_originalHabitatX(0),
-      m_originalHabitatY(0),
-      m_buildPathButton(),
-      m_buildPathButtonText(),
-      m_isBuildingPath(false),
-      m_pathTexture(),
-      m_pathTiles(),
-      m_lastPathX(-1),
-      m_lastPathY(-1),
-      m_zoo("Default Zoo", {}, 0, true)
+    : m_window(),                         // SFML window for rendering
+      m_windowWidth(1800),                // Default window width
+      m_windowHeight(1350),               // Default window height
+      m_font(),                           // Font for text display
+      m_zooName(),                        // Name of the zoo (entered by user)
+      m_nameEntered(false),               // Flag for whether zoo name has been entered
+      m_prompt(),                         // Text prompt for user input
+      m_inputText(),                      // Text displaying user input
+      m_gridWidth(40),                    // Width of the zoo grid in tiles
+      m_gridHeight(25),                   // Height of the zoo grid in tiles
+      m_tileSize(0),                      // Size of each grid tile in pixels (calculated later)
+      m_grassTexture(),                   // Texture for grass tiles
+      m_wallTexture(),                    // Texture for wall/perimeter tiles
+      m_tiles(),                          // 2D grid of tile sprites
+      m_isBuildingHabitat(false),         // Flag for habitat building mode
+      m_showHabitatOptions(false),        // Flag for showing habitat type options
+      m_selectedHabitatType(""),          // Currently selected habitat type
+      m_habitatTextures(),                // Map of habitat textures by type
+      m_buildHabitatButton(),             // Button for habitat building
+      m_buildHabitatButtonText(),         // Text for habitat building button
+      m_habitatOptionButtons(),           // Buttons for habitat type selection
+      m_habitatOptionTexts(),             // Text labels for habitat type buttons
+      m_habitatBuildings(),               // List of built habitats' positions and types
+      m_addAnimalButton(),                // Button for adding animals
+      m_addAnimalButtonText(),            // Text for add animal button
+      m_isAddingAnimal(false),            // Flag for animal adding mode
+      m_showAnimalOptionsForAnimal(false),// Flag for showing animal type options
+      m_statusMessage(),                  // Status message display
+      m_selectedHabitatIndex(-1),         // Index of the currently selected habitat
+      m_selectedAnimalType(""),           // Currently selected animal type
+      m_animalOptionButtons(),            // Buttons for animal type selection
+      m_animalOptionTexts(),              // Text labels for animal type buttons
+      m_animalTextures(),                 // Map of animal textures by type
+      m_animalsInHabitat(),               // List of animals in each habitat
+      m_moveHabitatButton(),              // Button for moving habitats
+      m_moveHabitatButtonText(),          // Text for move habitat button
+      m_isMovingHabitat(false),           // Flag for habitat moving mode
+      m_movingHabitatIndex(-1),           // Index of the habitat being moved
+      m_originalHabitatX(0),              // Original X position of habitat being moved
+      m_originalHabitatY(0),              // Original Y position of habitat being moved
+      m_buildPathButton(),                // Button for building paths
+      m_buildPathButtonText(),            // Text for build path button
+      m_isBuildingPath(false),            // Flag for path building mode
+      m_pathTexture(),                    // Texture for path tiles
+      m_pathTiles(),                      // List of path positions
+      m_lastPathX(-1),                    // Last X position where a path was placed
+      m_lastPathY(-1),                    // Last Y position where a path was placed
+      m_zoo("Default Zoo", {}, 0, true)   // Zoo object with default settings
 {
     m_window.create(sf::VideoMode(m_windowWidth, m_windowHeight), "Zoo Tycoon - Enter Zoo Name");
     if (!m_font.loadFromFile("fonts/DUSHICK.otf"))
@@ -191,16 +198,26 @@ Game::Game()
 }
 
 
+/**
+ * @brief Process all events from the SFML window
+ * 
+ * This method handles all user interactions including mouse clicks, window events,
+ * and UI interactions. It manages the game state based on user actions, such as
+ * building habitats, placing animals, and navigating the UI.
+ */
 void Game::processEvents()
 {
+    // Process all pending events
     sf::Event event;
     while (m_window.pollEvent(event))
     {
+        // Handle window close event
         if (event.type == sf::Event::Closed)
         {
             m_window.close();
             return;
         }
+        // Handle window resize event
         else if (event.type == sf::Event::Resized)
         {
             handleResize(event.size.width, event.size.height);
@@ -557,13 +574,31 @@ void Game::processEvents()
     }
 }
 
+/**
+ * @brief Handle window resize events
+ * 
+ * This method updates the game's internal dimensions and scales all UI elements
+ * appropriately when the window is resized. It ensures that the grid and UI
+ * components maintain proper proportions and positions.
+ * 
+ * @param width New window width in pixels
+ * @param height New window height in pixels
+ */
 void Game::handleResize(unsigned int width, unsigned int height)
 {
+    // Update internal dimensions
     m_windowWidth = width;
     m_windowHeight = height;
+    
+    // Update the view to match the new window size
     sf::FloatRect visibleArea(0, 0, width, height);
     m_window.setView(sf::View(visibleArea));
+    
+    // Calculate new tile size based on available space
+    // Leave room for UI elements at the bottom
     int newTileSize = std::min(int(width) / int(m_gridWidth), (int(height) - UI_MARGIN) / int(m_gridHeight));
+    
+    // Only update positions if the tile size has changed
     if (newTileSize != m_tileSize)
     {
         m_tileSize = newTileSize;
@@ -618,24 +653,38 @@ void Game::handleResize(unsigned int width, unsigned int height)
     }
 }
 
+/**
+ * @brief Update game state for the current frame
+ * 
+ * This method updates the game state based on the current mouse position
+ * and game mode (building habitat, placing animal, moving habitat, etc.).
+ * It updates status messages and handles path building logic.
+ */
 void Game::update()
 {
+    // Get current mouse position
     sf::Vector2i mousePos = sf::Mouse::getPosition(m_window);
 
+    // Handle habitat moving mode
     if (m_isMovingHabitat)
     {
+        // If no habitat is selected yet, prompt the user to select one
         if (m_movingHabitatIndex == -1)
         {
             m_statusMessage.setString("Select a habitat to move");
         }
+        // If a habitat is selected, show the current potential placement position
         else
         {
+            // Calculate grid coordinates from mouse position
             int newX = mousePos.x / m_tileSize;
             int newY = mousePos.y / m_tileSize;
 
+            // Update status message with current coordinates
             m_statusMessage.setString("Moving habitat to: (" + std::to_string(newX) +
                                       "," + std::to_string(newY) + ") - Click to place");
         }
+        // Position the status message
         m_statusMessage.setPosition(10, m_windowHeight - 30);
     }
     else if (m_isBuildingHabitat)
@@ -711,9 +760,19 @@ void Game::update()
     }
 }
 
+/**
+ * @brief Render all game elements to the window
+ * 
+ * This method is responsible for drawing all game elements to the SFML window.
+ * It renders the grid, paths, habitats, animals, UI elements, and status messages.
+ * The rendering order ensures proper layering of elements.
+ */
 void Game::render()
 {
+    // Clear the window with a dark gray background
     m_window.clear(sf::Color(50, 50, 50));
+    
+    // Draw the basic grid tiles (grass and walls)
     for (unsigned int y = 0; y < m_gridHeight; y++)
     {
         for (unsigned int x = 0; x < m_gridWidth; x++)
@@ -1044,30 +1103,56 @@ void Game::render()
     m_window.display();
 }
 
+/**
+ * @brief Main game loop
+ * 
+ * This method contains the main game loop that processes events,
+ * updates game state, and renders the game continuously until
+ * the window is closed.
+ */
 void Game::run()
 {
+    // Main game loop - continues until the window is closed
     while (m_window.isOpen())
     {
-        processEvents();
-        update();
-        render();
+        processEvents();  // Handle user input and events
+        update();         // Update game state
+        render();         // Draw everything to the screen
     }
 }
 
+/**
+ * @brief Loads a texture from file with fallback options
+ * 
+ * This utility method attempts to load a texture from the primary file path,
+ * then from a backup path if the primary fails. If both fail, it creates a
+ * solid-colored fallback texture.
+ * 
+ * @param texture Reference to the texture to be loaded
+ * @param primaryPath Primary file path to try first
+ * @param backupPath Backup file path to try if primary fails
+ * @param fallbackColor Color to use for fallback texture if both paths fail
+ * @return true if loading from either path succeeded, false if fallback was used
+ */
 bool Game::loadTexture(sf::Texture& texture, const std::string& primaryPath, const std::string& backupPath, sf::Color fallbackColor)
 {
+    // Try loading from the primary path first
     if (texture.loadFromFile(primaryPath))
     {
         std::cout << "Loaded texture from " << primaryPath << std::endl;
         return true;
     }
+    
+    // If primary path fails, try the backup path
     if (texture.loadFromFile(backupPath))
     {
         std::cout << "Loaded texture from " << backupPath << std::endl;
         return true;
     }
+    
+    // If both paths fail, create a solid color fallback texture
     sf::Image fallbackImage;
-    fallbackImage.create(64, 64, fallbackColor);
+    fallbackImage.create(64, 64, fallbackColor);  // Create a 64x64 image with the fallback color
     texture.loadFromImage(fallbackImage);
     std::cout << "Using fallback texture" << std::endl;
     return false;
