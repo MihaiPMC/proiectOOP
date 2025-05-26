@@ -41,7 +41,6 @@ public:
 
     void addHabitats(const std::vector<Habitat> &newHabitats);
 
-    // Method to move a habitat to a new position
     void moveHabitat(size_t habitatIndex, int newX, int newY);
 
     [[nodiscard]] int getVisitorCount() const;
