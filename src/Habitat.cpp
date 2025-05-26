@@ -13,46 +13,18 @@ std::map<std::string, std::vector<std::string>> Habitat::s_habitatSpecies = {
     {"Savanna", {"elephant", "lion", "zebra"}}
 };
 
-    /**
-     * @brief Constructor for creating a new habitat
-     * 
-     * Initializes a habitat with specified type, animals, and properties.
-     * Grid position is set to (-1,-1) indicating it's not placed on the grid yet.
-     * 
-     * @param type The type of habitat (Desert, Forest, etc.)
-     * @param animals Initial collection of animals for the habitat
-     * @param capacity Maximum number of animals the habitat can contain
-     * @param cleanlinessLevel Initial cleanliness level (0.0 to 1.0)
-     * @param price Cost to build the habitat
-     */
-    Habitat::Habitat(const std::string &type, const std::vector<std::shared_ptr<Animal>> &animals, int capacity, float cleanlinessLevel, float price)
+Habitat::Habitat(const std::string &type, const std::vector<std::shared_ptr<Animal>> &animals, int capacity, float cleanlinessLevel, float price)
     : m_type(type), m_animals(animals), m_capacity(capacity), m_cleanlinessLevel(cleanlinessLevel), m_price(price), m_gridX(-1), m_gridY(-1)
-    {
-    }
-    
-    /**
-     * @brief Copy constructor
-     * 
-     * Creates a new habitat by copying all attributes from another habitat.
-     * Note: This performs a shallow copy of the animal pointers.
-     * 
-     * @param other The habitat to copy from
-     */
-    Habitat::Habitat(const Habitat &other)
+{
+}
+
+Habitat::Habitat(const Habitat &other)
     : m_type(other.m_type), m_animals(other.m_animals), m_capacity(other.m_capacity),
       m_cleanlinessLevel(other.m_cleanlinessLevel), m_price(other.m_price),
       m_gridX(other.m_gridX), m_gridY(other.m_gridY)
-    {
-    }
-    
-    /**
-     * @brief Move constructor
-     * 
-     * Creates a new habitat by moving attributes from another habitat.
-     * This is more efficient than copying when the source habitat is temporary.
-     * 
-     * @param other The habitat to move from
-     */
+{
+}
+
 Habitat::Habitat(Habitat &&other) noexcept
     : m_type(std::move(other.m_type)), m_animals(std::move(other.m_animals)),
       m_capacity(other.m_capacity), m_cleanlinessLevel(other.m_cleanlinessLevel), m_price(other.m_price),
@@ -137,11 +109,11 @@ void Habitat::addAnimal(const std::shared_ptr<Animal> &animal)
             break;
         }
     }
-    
+
     if (!allowed) {
         throw AnimalException(animal->getSpecies() + " cannot live in a " + m_type + " habitat");
     }
-    
+
     m_animals.push_back(animal);
 }
 
@@ -221,7 +193,7 @@ void Habitat::showSpecificBehaviors() const {
         std::cout << "No animals in this habitat!" << std::endl;
         return;
     }
-    
+
     for (const auto& animal : m_animals) {
         demonstrateSpecificBehavior(animal);
         std::cout << "------------------------" << std::endl;
@@ -232,7 +204,7 @@ void Habitat::showSpecificBehaviors() const {
             if (m_animals.empty()) {
         return 0.0f;
             }
-            
+
             float totalSatisfaction = 0.0f;
 
             for (const auto& animal : m_animals) {
@@ -240,41 +212,41 @@ void Habitat::showSpecificBehaviors() const {
             }
 
             float cleanlinessMultiplier = 0.5f + (m_cleanlinessLevel * 0.5f);
-            
+
             return totalSatisfaction * cleanlinessMultiplier;
         }
 
         void Habitat::animalsInteractWithVisitors(int visitorCount) const {
             std::cout << "\nVisitors are interacting with animals in the " << m_type << " habitat:" << std::endl;
-            
+
             if (m_animals.empty()) {
         std::cout << "There are no animals in this habitat for visitors to interact with." << std::endl;
         return;
             }
-            
+
             int visitorsPerAnimal = visitorCount / static_cast<int>(m_animals.size());
-            
+
             for (const auto& animal : m_animals) {
         float enjoyment = animal->interactWithVisitors(visitorsPerAnimal);
         std::cout << "Visitor satisfaction from interaction: " << enjoyment << std::endl;
         std::cout << "------------------------" << std::endl;
             }
-            
+
             float totalSatisfaction = calculateVisitorSatisfaction(visitorCount);
             std::cout << "Total visitor satisfaction for " << m_type << " habitat: " << totalSatisfaction << std::endl;
         }
-        
+
         bool Habitat::canBuildAt(int gridX, int gridY, int gridWidth, int gridHeight) const {
             if (gridX < 1 || gridY < 1 || (gridX + 3) > (gridWidth - 1) || (gridY + 3) > (gridHeight - 1)) {
                 return false;
             }
             return true;
         }
-        
+
         void Habitat::renderHabitat(sf::RenderWindow& window, int tileSize, const sf::Texture& habitatTexture) const {
             if (m_gridX == -1 || m_gridY == -1)
                 return;
-                
+
             sf::Sprite habitatSprite;
             habitatSprite.setTexture(habitatTexture);
             sf::Vector2u texSize = habitatTexture.getSize();
@@ -284,16 +256,16 @@ void Habitat::showSpecificBehaviors() const {
             habitatSprite.setPosition(m_gridX * tileSize, m_gridY * tileSize);
             window.draw(habitatSprite);
         }
-        
+
         void Habitat::renderAnimals(sf::RenderWindow& window, int tileSize, const std::map<std::string, sf::Texture>& animalTextures) const {
             if (m_gridX == -1 || m_gridY == -1 || m_animals.empty())
                 return;
-                
+
             float habitatX = m_gridX * tileSize;
             float habitatY = m_gridY * tileSize;
             float habitatWidth = 3 * tileSize;
             float habitatHeight = 3 * tileSize;
-            
+
             for (size_t j = 0; j < m_animals.size(); j++) {
                 const auto& animal = m_animals[j];
                 auto it = animalTextures.find(animal->getSpecies());
@@ -317,40 +289,16 @@ void Habitat::showSpecificBehaviors() const {
                 }
             }
         }
-        
-        /**
-         * @brief Draws a highlight effect around the habitat
-         * 
-         * Creates a semi-transparent colored rectangle with an outline to highlight
-         * the habitat on the grid. Used to indicate selection or special status.
-         * Does nothing if the habitat doesn't have a valid grid position.
-         * 
-         * @param window SFML render window to draw on
-         * @param tileSize Size of each tile in pixels
-         * @param color Color to use for the highlight
-         * @param outlineThickness Thickness of the highlight outline in pixels
-         */
+
         void Habitat::highlightHabitat(sf::RenderWindow& window, int tileSize, const sf::Color& color, float outlineThickness) const {
-            // Don't highlight if habitat is not placed on the grid
             if (m_gridX == -1 || m_gridY == -1)
                 return;
-                
-            // Create a rectangle shape for the highlight
+
             sf::RectangleShape highlight;
-            
-            // Set size to cover the entire 3x3 habitat area
             highlight.setSize(sf::Vector2f(3 * tileSize, 3 * tileSize));
-            
-            // Position the highlight at the habitat's grid location
             highlight.setPosition(m_gridX * tileSize, m_gridY * tileSize);
-            
-            // Set a semi-transparent fill color (80 alpha)
             highlight.setFillColor(sf::Color(color.r, color.g, color.b, 80));
-            
-            // Set the outline color to the full opacity version of the color
             highlight.setOutlineColor(color);
-            
-            // Set the thickness of the outline
             highlight.setOutlineThickness(outlineThickness);
             window.draw(highlight);
         }
