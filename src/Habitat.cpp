@@ -235,6 +235,73 @@ void Habitat::showSpecificBehaviors() const {
             float totalSatisfaction = calculateVisitorSatisfaction(visitorCount);
             std::cout << "Total visitor satisfaction for " << m_type << " habitat: " << totalSatisfaction << std::endl;
         }
+        
+        bool Habitat::canBuildAt(int gridX, int gridY, int gridWidth, int gridHeight) const {
+            if (gridX < 1 || gridY < 1 || (gridX + 3) > (gridWidth - 1) || (gridY + 3) > (gridHeight - 1)) {
+                return false;
+            }
+            return true;
+        }
+        
+        void Habitat::renderHabitat(sf::RenderWindow& window, int tileSize, const sf::Texture& habitatTexture) const {
+            if (m_gridX == -1 || m_gridY == -1)
+                return;
+                
+            sf::Sprite habitatSprite;
+            habitatSprite.setTexture(habitatTexture);
+            sf::Vector2u texSize = habitatTexture.getSize();
+            float scaleX = (3 * tileSize) / float(texSize.x);
+            float scaleY = (3 * tileSize) / float(texSize.y);
+            habitatSprite.setScale(scaleX, scaleY);
+            habitatSprite.setPosition(m_gridX * tileSize, m_gridY * tileSize);
+            window.draw(habitatSprite);
+        }
+        
+        void Habitat::renderAnimals(sf::RenderWindow& window, int tileSize, const std::map<std::string, sf::Texture>& animalTextures) const {
+            if (m_gridX == -1 || m_gridY == -1 || m_animals.empty())
+                return;
+                
+            float habitatX = m_gridX * tileSize;
+            float habitatY = m_gridY * tileSize;
+            float habitatWidth = 3 * tileSize;
+            float habitatHeight = 3 * tileSize;
+            
+            for (size_t j = 0; j < m_animals.size(); j++) {
+                const auto& animal = m_animals[j];
+                auto it = animalTextures.find(animal->getSpecies());
+                if (it != animalTextures.end()) {
+                    sf::Sprite animalSprite;
+                    animalSprite.setTexture(it->second);
+                    sf::Vector2u texSize = it->second.getSize();
+                    float factor = 0.03f;
+                    animalSprite.setScale(factor, factor);
+                    int scaledWidth = int(texSize.x * factor);
+                    int scaledHeight = int(texSize.y * factor);
+                    int maxOffsetX = std::max(0, int(habitatWidth) - scaledWidth);
+                    int maxOffsetY = std::max(0, int(habitatHeight) - scaledHeight);
+                    std::hash<std::string> hasher;
+                    std::string key = std::to_string(m_gridX) + "_" + std::to_string(m_gridY) + "_" + std::to_string(j);
+                    size_t hashVal = hasher(key);
+                    int offsetX = hashVal % (maxOffsetX + 1);
+                    int offsetY = (hashVal / 100) % (maxOffsetY + 1);
+                    animalSprite.setPosition(habitatX + offsetX, habitatY + offsetY);
+                    window.draw(animalSprite);
+                }
+            }
+        }
+        
+        void Habitat::highlightHabitat(sf::RenderWindow& window, int tileSize, const sf::Color& color, float outlineThickness) const {
+            if (m_gridX == -1 || m_gridY == -1)
+                return;
+                
+            sf::RectangleShape highlight;
+            highlight.setSize(sf::Vector2f(3 * tileSize, 3 * tileSize));
+            highlight.setPosition(m_gridX * tileSize, m_gridY * tileSize);
+            highlight.setFillColor(sf::Color(color.r, color.g, color.b, 80));
+            highlight.setOutlineColor(color);
+            highlight.setOutlineThickness(outlineThickness);
+            window.draw(highlight);
+        }
 
 std::ostream &operator<<(std::ostream &os, const Habitat &habitat)
 {

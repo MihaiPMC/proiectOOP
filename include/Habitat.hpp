@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <memory>
+#include <SFML/Graphics.hpp>
 #include "exception/ZooExceptions.hpp"
 #include "animals/Fish.hpp"
 #include "animals/Bird.hpp"
@@ -46,11 +47,17 @@ public:
     int getGridY() const;
     bool overlaps(const Habitat &other) const;
     bool isValidPosition(int gridWidth, int gridHeight) const;
+    bool canBuildAt(int gridX, int gridY, int gridWidth, int gridHeight) const;
     void showSpecificBehaviors() const;
     void animalsInteractWithVisitors(int visitorCount) const;
     static std::vector<std::string> getAllowedAnimals(const std::string& habitatType);
     void demonstrateSpecificBehavior(const std::shared_ptr<Animal>& animal) const;
     float calculateVisitorSatisfaction(int visitorCount) const;
+    
+    // Rendering methods
+    void renderHabitat(sf::RenderWindow& window, int tileSize, const sf::Texture& habitatTexture) const;
+    void renderAnimals(sf::RenderWindow& window, int tileSize, const std::map<std::string, sf::Texture>& animalTextures) const;
+    void highlightHabitat(sf::RenderWindow& window, int tileSize, const sf::Color& color, float outlineThickness = 2.0f) const;
 
     friend std::ostream &operator<<(std::ostream &os, const Habitat &habitat);
 };

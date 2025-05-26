@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <map>
+#include <SFML/Graphics.hpp>
 #include "Animal.hpp"
 #include "Habitat.hpp"
 #include "exception/ZooExceptions.hpp"
@@ -64,6 +66,20 @@ public:
     int findHabitatAt(int gridX, int gridY) const;
 
     bool addAnimalTo(int habitatIndex, const std::string &animalType);
+    
+    // UI and rendering related methods
+    static bool loadTexture(sf::Texture &texture, const std::string &primaryPath, const std::string &backupPath,
+                          sf::Color fallbackColor);
+    
+    static void nameInput(sf::RenderWindow& window, sf::Font& font, std::string& zooName, bool& nameEntered);
+    
+    static void showTutorial(sf::RenderWindow& window, sf::Font& font);
+    
+    void renderHabitats(sf::RenderWindow& window, int tileSize, 
+                        const std::map<std::string, sf::Texture>& habitatTextures,
+                        const std::map<std::string, sf::Texture>& animalTextures) const;
+    
+    void highlightHabitatAt(sf::RenderWindow& window, int tileSize, int index, const sf::Color& color) const;
 
     friend std::ostream &operator<<(std::ostream &os, const Zoo &zoo);
 };

@@ -247,3 +247,126 @@ bool Zoo::addAnimalTo(int habitatIndex, const std::string &animalType)
         return false;
     }
 }
+
+bool Zoo::loadTexture(sf::Texture &texture, const std::string &primaryPath, const std::string &backupPath,
+                       sf::Color fallbackColor)
+{
+    if (texture.loadFromFile(primaryPath))
+    {
+        std::cout << "Loaded texture from " << primaryPath << std::endl;
+        return true;
+    }
+    if (texture.loadFromFile(backupPath))
+    {
+        std::cout << "Loaded texture from " << backupPath << std::endl;
+        return true;
+    }
+    sf::Image fallbackImage;
+    fallbackImage.create(64, 64, fallbackColor);
+    texture.loadFromImage(fallbackImage);
+    std::cout << "Using fallback texture" << std::endl;
+    return false;
+}
+
+void Zoo::nameInput(sf::RenderWindow& window, sf::Font& font, std::string& zooName, bool& nameEntered)
+{
+    sf::Text prompt;
+    sf::Text inputText;
+    
+    prompt.setFont(font);
+    prompt.setCharacterSize(30);
+    prompt.setFillColor(sf::Color::White);
+    prompt.setString("Hello. Welcome to Zoo Tycoon. Please enter your zoo name:");
+    
+    inputText.setFont(font);
+    inputText.setCharacterSize(40);
+    inputText.setFillColor(sf::Color::Yellow);
+    
+    while (window.isOpen() && !nameEntered)
+    {
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed)
+            {
+                window.close();
+                return;
+            }
+            else if (event.type == sf::Event::TextEntered)
+            {
+                if (event.text.unicode == 8)
+                {
+                    if (!zooName.empty())
+                        zooName.pop_back();
+                }
+                else if (event.text.unicode < 128 && event.text.unicode != 13)
+                    zooName += static_cast<char>(event.text.unicode);
+            }
+            else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Enter)
+            {
+                if (!zooName.empty())
+                    nameEntered = true;
+            }
+        }
+        inputText.setString(zooName);
+        prompt.setPosition(window.getSize().x / 2.f - prompt.getLocalBounds().width / 2.f, window.getSize().y / 3.f);
+        inputText.setPosition(window.getSize().x / 2.f - inputText.getLocalBounds().width / 2.f, window.getSize().y / 2.f);
+        window.clear(sf::Color(50, 50, 50));
+        window.draw(prompt);
+        window.draw(inputText);
+        window.display();
+    }
+}
+
+void Zoo::showTutorial(sf::RenderWindow& window, sf::Font& font)
+{
+    sf::Text tutorial;
+    tutorial.setFont(font);
+    tutorial.setCharacterSize(24);
+    tutorial.setFillColor(sf::Color::White);
+    tutorial.setString(
+        "Tutorial:\nClick 'Build Habitat' to construct a habitat,\nthen click 'Add Animal' to add animals.\nPress any key to continue.");
+    tutorial.setPosition(window.getSize().x / 2.f - tutorial.getLocalBounds().width / 2.f, window.getSize().y / 3.f);
+
+    bool tutorialDone = false;
+    while (window.isOpen() && !tutorialDone)
+    {
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed)
+            {
+                window.close();
+                return;
+            }
+            else if (event.type == sf::Event::KeyPressed)
+            {
+                tutorialDone = true;
+            }
+        }
+        window.clear(sf::Color(50, 50, 50));
+        window.draw(tutorial);
+        window.display();
+    }
+}
+
+void Zoo::renderHabitats(sf::RenderWindow& window, int tileSize, const std::map<std::string, sf::Texture>& habitatTextures, 
+                         const std::map<std::string, sf::Texture>& animalTextures) const
+{
+    for (const auto& habitat : m_habitats) {
+        if (habitat.getGridX() != -1) {
+            auto it = habitatTextures.find(habitat.getType());
+            if (it != habitatTextures.end()) {
+                habitat.renderHabitat(window, tileSize, it->second);
+                habitat.renderAnimals(window, tileSize, animalTextures);
+            }
+        }
+    }
+}
+
+void Zoo::highlightHabitatAt(sf::RenderWindow& window, int tileSize, int index, const sf::Color& color) const
+{
+    if (index >= 0 && index < static_cast<int>(m_habitats.size())) {
+        m_habitats[index].highlightHabitat(window, tileSize, color, 2.0f);
+    }
+}

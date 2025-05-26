@@ -69,29 +69,32 @@ Game::Game()
     m_inputText.setFont(m_font);
     m_inputText.setCharacterSize(40);
     m_inputText.setFillColor(sf::Color::Yellow);
-    nameInput();
-    showTutorial();
+    
+    // Use the moved methods from Zoo class
+    Zoo::nameInput(m_window, m_font, m_zooName, m_nameEntered);
+    Zoo::showTutorial(m_window, m_font);
+    
     if (m_zooName.empty())
         m_zooName = "ZooTycoon";
     m_window.setTitle(m_zooName);
 
     m_zoo.setName(m_zooName);
 
-    loadTexture(m_grassTexture, "images/grass.png", "../images/grass.png", sf::Color::Green);
-    loadTexture(m_wallTexture, "images/wall.png", "../images/wall.png", sf::Color(139, 69, 19));
+    Zoo::loadTexture(m_grassTexture, "images/grass.png", "../images/grass.png", sf::Color::Green);
+    Zoo::loadTexture(m_wallTexture, "images/wall.png", "../images/wall.png", sf::Color(139, 69, 19));
     {
         sf::Texture temp;
-        loadTexture(temp, "images/habitats/desertNormal.png", "../images/habitats/desertNormal.png",
+        Zoo::loadTexture(temp, "images/habitats/desertNormal.png", "../images/habitats/desertNormal.png",
                     sf::Color(210, 180, 140));
         m_habitatTextures["Desert"] = temp;
-        loadTexture(temp, "images/habitats/forestNormal.png", "../images/habitats/forestNormal.png", sf::Color::Green);
+        Zoo::loadTexture(temp, "images/habitats/forestNormal.png", "../images/habitats/forestNormal.png", sf::Color::Green);
         m_habitatTextures["Forest"] = temp;
-        loadTexture(temp, "images/habitats/mountainNormal.png", "../images/habitats/mountainNormal.png",
+        Zoo::loadTexture(temp, "images/habitats/mountainNormal.png", "../images/habitats/mountainNormal.png",
                     sf::Color(169, 169, 169));
         m_habitatTextures["Mountain"] = temp;
-        loadTexture(temp, "images/habitats/oceanNormal.png", "../images/habitats/oceanNormal.png", sf::Color::Blue);
+        Zoo::loadTexture(temp, "images/habitats/oceanNormal.png", "../images/habitats/oceanNormal.png", sf::Color::Blue);
         m_habitatTextures["Ocean"] = temp;
-        loadTexture(temp, "images/habitats/savannaNormal.png", "../images/habitats/savannaNormal.png",
+        Zoo::loadTexture(temp, "images/habitats/savannaNormal.png", "../images/habitats/savannaNormal.png",
                     sf::Color(238, 232, 170));
         m_habitatTextures["Savanna"] = temp;
     }
@@ -187,95 +190,6 @@ Game::Game()
     }
 }
 
-bool Game::loadTexture(sf::Texture &texture, const std::string &primaryPath, const std::string &backupPath,
-                       sf::Color fallbackColor)
-{
-    if (texture.loadFromFile(primaryPath))
-    {
-        std::cout << "Loaded texture from " << primaryPath << std::endl;
-        return true;
-    }
-    if (texture.loadFromFile(backupPath))
-    {
-        std::cout << "Loaded texture from " << backupPath << std::endl;
-        return true;
-    }
-    sf::Image fallbackImage;
-    fallbackImage.create(64, 64, fallbackColor);
-    texture.loadFromImage(fallbackImage);
-    std::cout << "Using fallback texture" << std::endl;
-    return false;
-}
-
-void Game::nameInput()
-{
-    while (m_window.isOpen() && !m_nameEntered)
-    {
-        sf::Event event;
-        while (m_window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-            {
-                m_window.close();
-                return;
-            }
-            else if (event.type == sf::Event::TextEntered)
-            {
-                if (event.text.unicode == 8)
-                {
-                    if (!m_zooName.empty())
-                        m_zooName.pop_back();
-                }
-                else if (event.text.unicode < 128 && event.text.unicode != 13)
-                    m_zooName += static_cast<char>(event.text.unicode);
-            }
-            else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Enter)
-            {
-                if (!m_zooName.empty())
-                    m_nameEntered = true;
-            }
-        }
-        m_inputText.setString(m_zooName);
-        m_prompt.setPosition(m_windowWidth / 2.f - m_prompt.getLocalBounds().width / 2.f, m_windowHeight / 3.f);
-        m_inputText.setPosition(m_windowWidth / 2.f - m_inputText.getLocalBounds().width / 2.f, m_windowHeight / 2.f);
-        m_window.clear(sf::Color(50, 50, 50));
-        m_window.draw(m_prompt);
-        m_window.draw(m_inputText);
-        m_window.display();
-    }
-}
-
-void Game::showTutorial()
-{
-    sf::Text tutorial;
-    tutorial.setFont(m_font);
-    tutorial.setCharacterSize(24);
-    tutorial.setFillColor(sf::Color::White);
-    tutorial.setString(
-        "Tutorial:\nClick 'Build Habitat' to construct a habitat,\nthen click 'Add Animal' to add animals.\nPress any key to continue.");
-    tutorial.setPosition(m_windowWidth / 2.f - tutorial.getLocalBounds().width / 2.f, m_windowHeight / 3.f);
-
-    bool tutorialDone = false;
-    while (m_window.isOpen() && !tutorialDone)
-    {
-        sf::Event event;
-        while (m_window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-            {
-                m_window.close();
-                return;
-            }
-            else if (event.type == sf::Event::KeyPressed)
-            {
-                tutorialDone = true;
-            }
-        }
-        m_window.clear(sf::Color(50, 50, 50));
-        m_window.draw(tutorial);
-        m_window.display();
-    }
-}
 
 void Game::processEvents()
 {
@@ -909,56 +823,51 @@ void Game::render()
         m_window.draw(pathSprite);
     }
 
-    for (auto &b: m_habitatBuildings)
-    {
-        int bx, by;
-        std::string type;
-        std::tie(bx, by, type) = b;
-        if (m_habitatTextures.find(type) != m_habitatTextures.end())
-        {
-            sf::Sprite habitatSprite;
-            habitatSprite.setTexture(m_habitatTextures[type]);
-            sf::Vector2u texSize = m_habitatTextures[type].getSize();
-            float scaleX = (3 * m_tileSize) / float(texSize.x);
-            float scaleY = (3 * m_tileSize) / float(texSize.y);
-            habitatSprite.setScale(scaleX, scaleY);
-            habitatSprite.setPosition(bx * m_tileSize, by * m_tileSize);
-            m_window.draw(habitatSprite);
-        }
-    }
-    for (size_t i = 0; i < m_habitatBuildings.size(); i++)
-    {
-        int bx, by;
-        std::string type;
-        std::tie(bx, by, type) = m_habitatBuildings[i];
-        float habitatX = bx * m_tileSize;
-        float habitatY = by * m_tileSize;
-        float habitatWidth = 3 * m_tileSize;
-        float habitatHeight = 3 * m_tileSize;
-        int animalCount = m_animalsInHabitat[i].size();
-        for (int j = 0; j < animalCount; j++)
-        {
-            const std::string &animal = m_animalsInHabitat[i][j];
-            if (m_animalTextures.find(animal) != m_animalTextures.end())
-            {
-                sf::Sprite animalSprite;
-                animalSprite.setTexture(m_animalTextures[animal]);
-                sf::Vector2u texSize = m_animalTextures[animal].getSize();
-                float factor = 0.03f;
-                animalSprite.setScale(factor, factor);
-                int scaledWidth = int(texSize.x * factor);
-                int scaledHeight = int(texSize.y * factor);
-                int maxOffsetX = std::max(0, int(habitatWidth) - scaledWidth);
-                int maxOffsetY = std::max(0, int(habitatHeight) - scaledHeight);
-                std::hash<std::string> hasher;
-                std::string key = std::to_string(i) + "_" + std::to_string(j);
-                size_t hashVal = hasher(key);
-                int offsetX = hashVal % (maxOffsetX + 1);
-                int offsetY = (hashVal / 100) % (maxOffsetY + 1);
-                animalSprite.setPosition(habitatX + offsetX, habitatY + offsetY);
-                m_window.draw(animalSprite);
+    // Use the Zoo class to render habitats and animals
+    m_zoo.renderHabitats(m_window, m_tileSize, m_habitatTextures, m_animalTextures);
+    
+    // If moving a habitat, highlight it
+    if (m_isMovingHabitat && m_movingHabitatIndex != -1) {
+        m_zoo.highlightHabitatAt(m_window, m_tileSize, m_movingHabitatIndex, sf::Color(255, 165, 0));
+        
+        // Show the new position preview
+        sf::Vector2i mousePos = sf::Mouse::getPosition(m_window);
+        int newX = mousePos.x / m_tileSize;
+        int newY = mousePos.y / m_tileSize;
+        
+        newX = std::max(1, std::min(newX, static_cast<int>(m_gridWidth) - 4));
+        newY = std::max(1, std::min(newY, static_cast<int>(m_gridHeight) - 4));
+        
+        bool isValidPosition = true;
+        for (size_t i = 0; i < m_habitatBuildings.size(); i++) {
+            if (static_cast<int>(i) == m_movingHabitatIndex) continue;
+            
+            int otherX, otherY;
+            std::tie(otherX, otherY, std::ignore) = m_habitatBuildings[i];
+            
+            bool overlapsX = (newX < otherX + 3) && (newX + 3 > otherX);
+            bool overlapsY = (newY < otherY + 3) && (newY + 3 > otherY);
+            
+            if (overlapsX && overlapsY) {
+                isValidPosition = false;
+                break;
             }
         }
+        
+        sf::RectangleShape newPositionPreview;
+        newPositionPreview.setSize(sf::Vector2f(3 * m_tileSize, 3 * m_tileSize));
+        newPositionPreview.setPosition(newX * m_tileSize, newY * m_tileSize);
+        
+        if (isValidPosition) {
+            newPositionPreview.setFillColor(sf::Color(0, 255, 0, 80));
+            newPositionPreview.setOutlineColor(sf::Color::Green);
+        } else {
+            newPositionPreview.setFillColor(sf::Color(255, 0, 0, 80));
+            newPositionPreview.setOutlineColor(sf::Color::Red);
+        }
+        
+        newPositionPreview.setOutlineThickness(2);
+        m_window.draw(newPositionPreview);
     }
     if (m_isBuildingHabitat)
     {
@@ -1143,4 +1052,23 @@ void Game::run()
         update();
         render();
     }
+}
+
+bool Game::loadTexture(sf::Texture& texture, const std::string& primaryPath, const std::string& backupPath, sf::Color fallbackColor)
+{
+    if (texture.loadFromFile(primaryPath))
+    {
+        std::cout << "Loaded texture from " << primaryPath << std::endl;
+        return true;
+    }
+    if (texture.loadFromFile(backupPath))
+    {
+        std::cout << "Loaded texture from " << backupPath << std::endl;
+        return true;
+    }
+    sf::Image fallbackImage;
+    fallbackImage.create(64, 64, fallbackColor);
+    texture.loadFromImage(fallbackImage);
+    std::cout << "Using fallback texture" << std::endl;
+    return false;
 }
