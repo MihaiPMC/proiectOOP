@@ -248,6 +248,34 @@ bool Zoo::addAnimalTo(int habitatIndex, const std::string &animalType)
     }
 }
 
+bool Zoo::deleteHabitatAt(int habitatIndex)
+{
+    if (habitatIndex < 0 || habitatIndex >= static_cast<int>(m_habitats.size()))
+    {
+        throw HabitatException("Invalid habitat index: " + std::to_string(habitatIndex));
+    }
+
+    // Calculate the refund amount (50% of the habitat price)
+    float refundAmount = calculateRefund(m_habitats[habitatIndex].getPrice());
+
+    // Get habitat type for logging
+    std::string habitatType = m_habitats[habitatIndex].getType();
+
+    // Remove the habitat (the destructor will be called automatically)
+    m_habitats.erase(m_habitats.begin() + habitatIndex);
+
+    // Add the refund to the budget
+    m_budget += refundAmount;
+
+    std::cout << "Deleted " << habitatType << " habitat and received $" << refundAmount << " refund." << std::endl;
+    return true;
+}
+
+float Zoo::calculateRefund(float originalPrice) const
+{
+    return originalPrice * 0.5f; // 50% refund
+}
+
 bool Zoo::loadTexture(sf::Texture &texture, const std::string &primaryPath, const std::string &backupPath,
                        sf::Color fallbackColor)
 {

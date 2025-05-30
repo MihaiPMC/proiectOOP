@@ -57,6 +57,10 @@ Game::Game()
       m_pathTiles(),
       m_lastPathX(-1),
       m_lastPathY(-1),
+      m_deleteButton(),
+      m_deleteButtonText(),
+      m_isDeletingObject(false),
+      m_deletingObjectIndex(-1),
       m_zoo("Default Zoo", {}, 0, true)
 {
     m_window.create(sf::VideoMode(m_windowWidth, m_windowHeight), "Zoo Tycoon - Enter Zoo Name");
@@ -153,6 +157,20 @@ Game::Game()
     m_buildPathButtonText.setPosition(m_buildPathButton.getPosition().x + 10,
                                       m_buildPathButton.getPosition().y + 5);
 
+    // Initialize delete button
+    m_deleteButton.setSize(sf::Vector2f(150, 40));
+    m_deleteButton.setFillColor(sf::Color(200, 0, 0));
+    m_deleteButton.setPosition(m_buildPathButton.getPosition().x + m_buildPathButton.getSize().x + 10,
+                               m_buildHabitatButton.getPosition().y);
+    m_deleteButtonText.setFont(m_font);
+    m_deleteButtonText.setCharacterSize(20);
+    m_deleteButtonText.setFillColor(sf::Color::White);
+    m_deleteButtonText.setString("Delete");
+    m_deleteButtonText.setPosition(m_deleteButton.getPosition().x + 10,
+                                   m_deleteButton.getPosition().y + 5);
+    m_isDeletingObject = false;
+    m_deletingObjectIndex = -1;
+
     loadTexture(m_pathTexture, "images/path.png", "../images/path.png", sf::Color(153, 102, 51));
 
     m_statusMessage.setFont(m_font);
@@ -242,7 +260,7 @@ void Game::processEvents()
                 std::cout << "Select a habitat to move." << std::endl;
             }
             else if (!m_isAddingAnimal && !m_isBuildingHabitat && !m_showHabitatOptions && !m_isMovingHabitat && !
-                     m_isBuildingPath)
+                     m_isBuildingPath && !m_isDeletingObject)
             {
                 if (m_buildHabitatButton.getGlobalBounds().contains(mousePos.x, mousePos.y))
                     m_showHabitatOptions = true;
@@ -251,6 +269,13 @@ void Game::processEvents()
                     m_isBuildingPath = true;
                     std::cout << "Building paths. Click on grid cells to place paths." << std::endl;
                     m_statusMessage.setString("Click on grid cells to build paths");
+                }
+                else if (m_deleteButton.getGlobalBounds().contains(mousePos.x, mousePos.y))
+                {
+                    m_isDeletingObject = true;
+                    m_deletingObjectIndex = -1;
+                    std::cout << "Select a habitat to delete." << std::endl;
+                    m_statusMessage.setString("Select a habitat to delete");
                 }
             }
             else if (m_isBuildingPath)
@@ -262,6 +287,51 @@ void Game::processEvents()
                     m_lastPathY = -1;
                     std::cout << "Path building canceled." << std::endl;
                     m_statusMessage.setString("");
+                }
+            }
+            else if (m_isDeletingObject)
+            {
+                if (m_deleteButton.getGlobalBounds().contains(mousePos.x, mousePos.y))
+                {
+                    m_isDeletingObject = false;
+                    m_deletingObjectIndex = -1;
+                    std::cout << "Delete operation canceled." << std::endl;
+                    m_statusMessage.setString("");
+                }
+                else
+                {
+                    // Check if user clicked on a habitat
+                    int gridX = mousePos.x / m_tileSize;
+                    int gridY = mousePos.y / m_tileSize;
+
+                    int habitatIndex = m_zoo.findHabitatAt(gridX, gridY);
+
+                    if (habitatIndex != -1)
+                    {
+                        try
+                        {
+                            // Delete the habitat and get refund
+                            if (m_zoo.deleteHabitatAt(habitatIndex))
+                            {
+                                // Also update the internal representation
+                                if (habitatIndex < static_cast<int>(m_habitatBuildings.size()))
+                                {
+                                    m_habitatBuildings.erase(m_habitatBuildings.begin() + habitatIndex);
+                                    m_animalsInHabitat.erase(m_animalsInHabitat.begin() + habitatIndex);
+                                }
+
+                                std::cout << "Habitat deleted successfully." << std::endl;
+                            }
+                        }
+                        catch (const std::exception& e)
+                        {
+                            std::cout << "Error deleting habitat: " << e.what() << std::endl;
+                        }
+
+                        m_isDeletingObject = false;
+                        m_deletingObjectIndex = -1;
+                        m_statusMessage.setString("");
+                    }
                 }
             }
             else if (m_showHabitatOptions)
@@ -592,6 +662,10 @@ void Game::handleResize(unsigned int width, unsigned int height)
                                       m_buildHabitatButton.getPosition().y);
         m_buildPathButtonText.setPosition(m_buildPathButton.getPosition().x + 10,
                                           m_buildPathButton.getPosition().y + 5);
+        m_deleteButton.setPosition(m_buildPathButton.getPosition().x + m_buildPathButton.getSize().x + 10,
+                                  m_buildHabitatButton.getPosition().y);
+        m_deleteButtonText.setPosition(m_deleteButton.getPosition().x + 10,
+                                       m_deleteButton.getPosition().y + 5);
         float btnWidth = 120, btnHeight = 40;
         float startX = m_buildHabitatButton.getPosition().x;
         float startY = m_buildHabitatButton.getPosition().y + m_buildHabitatButton.getSize().y + 10;
@@ -645,6 +719,15 @@ void Game::update()
 
         m_statusMessage.setString("Building: " + m_selectedHabitatType +
                                   " | Grid position: (" + std::to_string(cellX) +
+                                  "," + std::to_string(cellY) + ")");
+        m_statusMessage.setPosition(10, m_windowHeight - 30);
+    }
+    else if (m_isDeletingObject)
+    {
+        int cellX = mousePos.x / m_tileSize;
+        int cellY = mousePos.y / m_tileSize;
+
+        m_statusMessage.setString("Deleting | Grid position: (" + std::to_string(cellX) +
                                   "," + std::to_string(cellY) + ")");
         m_statusMessage.setPosition(10, m_windowHeight - 30);
     }
@@ -1007,6 +1090,26 @@ void Game::render()
         m_buildPathButton.setFillColor(sf::Color(153, 102, 51));
     }
 
+    if (m_isDeletingObject)
+    {
+        m_deleteButtonText.setString("Cancel Delete");
+        m_deleteButton.setFillColor(sf::Color::Red);
+
+        sf::Text deleteStatusText;
+        deleteStatusText.setFont(m_font);
+        deleteStatusText.setCharacterSize(16);
+        deleteStatusText.setFillColor(sf::Color::Yellow);
+        deleteStatusText.setString("Select a habitat to delete");
+        deleteStatusText.setPosition(m_deleteButton.getPosition().x,
+                                   m_deleteButton.getPosition().y + m_deleteButton.getSize().y + 10);
+        m_window.draw(deleteStatusText);
+    }
+    else
+    {
+        m_deleteButtonText.setString("Delete");
+        m_deleteButton.setFillColor(sf::Color(200, 0, 0));
+    }
+
     m_window.draw(m_buildHabitatButton);
     m_window.draw(m_buildHabitatButtonText);
     m_window.draw(m_addAnimalButton);
@@ -1015,6 +1118,8 @@ void Game::render()
     m_window.draw(m_moveHabitatButtonText);
     m_window.draw(m_buildPathButton);
     m_window.draw(m_buildPathButtonText);
+    m_window.draw(m_deleteButton);
+    m_window.draw(m_deleteButtonText);
     if (m_showHabitatOptions)
         for (size_t i = 0; i < m_habitatOptionButtons.size(); i++)
         {

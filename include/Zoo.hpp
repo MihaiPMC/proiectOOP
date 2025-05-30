@@ -67,6 +67,12 @@ public:
 
     bool addAnimalTo(int habitatIndex, const std::string &animalType);
     
+    // Delete habitat and get refund
+    bool deleteHabitatAt(int habitatIndex);
+
+    // Calculate refund amount (50% of price)
+    float calculateRefund(float originalPrice) const;
+
     // UI and rendering related methods
     static bool loadTexture(sf::Texture &texture, const std::string &primaryPath, const std::string &backupPath,
                           sf::Color fallbackColor);

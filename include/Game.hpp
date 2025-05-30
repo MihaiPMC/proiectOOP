@@ -80,5 +80,11 @@ private:
     int m_lastPathX;
     int m_lastPathY;
 
+    // Delete functionality
+    sf::RectangleShape m_deleteButton;
+    sf::Text m_deleteButtonText;
+    bool m_isDeletingObject;
+    int m_deletingObjectIndex;
+
     Zoo m_zoo;
 };
