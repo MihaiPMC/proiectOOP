@@ -9,7 +9,7 @@ int main()
 {
     try
     {
-        Game game;
+        Game& game = Game::getInstance();
         game.run();
         return 0;
     } catch (const BudgetException &e)

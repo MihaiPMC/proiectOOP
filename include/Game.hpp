@@ -9,11 +9,19 @@
 class Game
 {
 public:
-    Game();
+    // Metodă statică pentru a obține instanța singleton
+    static Game& getInstance();
+
+    // Previne copierea și atribuirea
+    Game(const Game&) = delete;
+    Game& operator=(const Game&) = delete;
 
     void run();
 
 private:
+    // Constructor privat pentru singleton
+    Game();
+
     bool loadTexture(sf::Texture &texture, const std::string &primaryPath, const std::string &backupPath,
                      sf::Color fallbackColor);
 

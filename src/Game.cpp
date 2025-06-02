@@ -9,6 +9,13 @@
 #include <sstream>
 static const int UI_MARGIN = 50;
 
+// Metodă statică pentru a obține instanța singleton
+Game& Game::getInstance() {
+    static Game instance; // Lazy initialization, thread-safe în C++11
+    return instance;
+}
+
+// Constructorul acum este privat
 Game::Game()
     : m_window(),
       m_windowWidth(1800),
