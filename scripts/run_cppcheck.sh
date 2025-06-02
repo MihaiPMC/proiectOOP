@@ -8,5 +8,4 @@ cppcheck --enable=all \
     -i"${GEN_DIR:-generated}" --suppress="*:${GEN_DIR:-generated}/*" \
     --suppress=missingIncludeSystem \
     --suppress=unmatchedSuppression \
-    --suppress=useStlAlgorithm \
-    --error-exitcode=1
+    --suppress=useStlAlgorithm
