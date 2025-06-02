@@ -20,9 +20,20 @@ endif()
 include(cmake/Options.cmake)
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src)
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-file(GLOB_RECURSE PROJECT_SOURCES "src/*.cpp")
-file(GLOB_RECURSE PROJECT_HEADERS "src/*.hpp" "src/*.h")
+# Colectează automat toate fișierele sursă și header
+file(GLOB_RECURSE PROJECT_SOURCES 
+    "src/*.cpp"
+    "include/*.cpp"
+)
+
+file(GLOB_RECURSE PROJECT_HEADERS 
+    "src/*.hpp" 
+    "src/*.h"
+    "include/*.hpp"
+    "include/*.h"
+)
 
 if(NOT PROJECT_SOURCES)
     set(DEFAULT_MAIN_CPP "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
@@ -30,33 +41,10 @@ if(NOT PROJECT_SOURCES)
 
     file(WRITE ${DEFAULT_MAIN_CPP} "#include <SFML/Graphics.hpp>\n\nint main() {\n    sf::RenderWindow window(sf::VideoMode(800, 600), \"SFML Window\");\n    sf::CircleShape shape(100.f);\n    shape.setFillColor(sf::Color::Green);\n\n    while (window.isOpen()) {\n        sf::Event event;\n        while (window.pollEvent(event)) {\n            if (event.type == sf::Event::Closed)\n                window.close();\n        }\n\n        window.clear();\n        window.draw(shape);\n        window.display();\n    }\n\n    return 0;\n}\n")
 
-    set(PROJECT_SOURCES ${DEFAULT_MAIN_CPP}
-            src/Zoo.cpp
-            include/Zoo.hpp
-            src/Animal.cpp
-            include/Animal.hpp
-            src/Habitat.cpp
-            include/Habitat.hpp
-            src/Visitor.cpp
-            include/Visitor.hpp
-            src/Game.cpp
-            include/Game.hpp
-            include/animals/Bird.hpp
-            include/animals/Mammal.hpp
-            include/animals/Fish.hpp
-            src/animals/Bird.cpp
-            src/animals/Mammal.cpp
-            src/animals/Fish.cpp
-            src/animals/Reptile.cpp
-            include/animals/Reptile.hpp
-            src/exception/AnimalException.cpp
-            src/exception/BudgetException.cpp
-            src/exception/ZooExceptions.cpp
-            src/exception/HabitatException.cpp
-            include/exception/AnimalException.hpp
-            include/exception/BudgetException.hpp
-            include/exception/ZooExceptions.hpp
-            include/exception/HabitatException.hpp
+    # Recolectează fișierele după ce am creat main.cpp
+    file(GLOB_RECURSE PROJECT_SOURCES 
+        "src/*.cpp"
+        "include/*.cpp"
     )
 endif()
 
@@ -64,7 +52,11 @@ add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} ${PROJECT_HEADERS})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "oop")
 
-target_include_directories(${PROJECT_NAME} PRIVATE src)
+# Include atât src cât și include directories
+target_include_directories(${PROJECT_NAME} PRIVATE 
+    src
+    include
+)
 
 if(APPLE)
     file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/sfml_char_traits_fix.hpp" "
