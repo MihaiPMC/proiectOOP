@@ -13,7 +13,9 @@
 #include "../include/animals/Elephant.hpp"
 #include "../include/animals/Lion.hpp"
 #include "../include/animals/Zebra.hpp"
+#include "../include/animals/Coyote.hpp"
 #include <random>
+#include <iostream>
 
 Animal::Animal(const std::string &name, const std::string &species, int age, float weight, float height,
                float is_healthy, int price, float hunger)
@@ -298,6 +300,14 @@ std::shared_ptr<Animal> Animal::createRandomAnimal(const std::string &species, i
         return std::make_shared<Camel>(
             getRandomName(), species, distAge(gen), distWeight(gen), distHeight(gen),
             distHumps(gen), distHealth(gen), 1200, 0.0f
+        );
+    } else if (species == "Coyote") {
+        std::vector<std::string> coatColors = {"tan", "gray", "reddish-brown"};
+        std::uniform_int_distribution<> distColor(0, coatColors.size() - 1);
+        std::uniform_real_distribution<float> distHunting(0.4f, 0.9f);
+        return std::make_shared<Coyote>(
+            getRandomName(), species, distAge(gen), 15.0f, 50.0f,
+            distHunting(gen), coatColors[distColor(gen)], distHealth(gen), 900, 0.0f
         );
     } else if (species == "Scorpion") {
         std::uniform_real_distribution<float> distVenom(0.1f, 0.9f);

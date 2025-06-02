@@ -20,6 +20,13 @@ file(MAKE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/
 file(GLOB_RECURSE PROJECT_SOURCES "src/*.cpp" "include/*.cpp")
 file(GLOB_RECURSE PROJECT_HEADERS "src/*.h*" "include/*.h*")
 
+# Explicitly check if AnimalFactory.cpp was found, add it if not
+list(FIND PROJECT_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/animals/AnimalFactory.cpp" AF_IDX)
+if(AF_IDX EQUAL -1)
+    message(STATUS "Adding AnimalFactory.cpp to sources")
+    list(APPEND PROJECT_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/animals/AnimalFactory.cpp")
+endif()
+
 # Remove deleted animal classes from build
 list(FILTER PROJECT_SOURCES EXCLUDE REGEX "src/animals/(Bird|Fish|Mammal|Reptile)\.cpp$")
 
