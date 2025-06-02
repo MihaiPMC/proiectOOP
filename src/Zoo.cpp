@@ -113,6 +113,28 @@ std::ostream &operator<<(std::ostream &os, const Zoo &zoo)
     return os;
 }
 
+void Zoo::syncInventoryWithHabitats() {
+    m_allAnimalsInventory.clear();
+
+    for (const auto& habitat : m_habitats) {
+        const auto& animals = habitat.getAnimals();
+        for (const auto& animal : animals) {
+            m_allAnimalsInventory.addItem(animal);
+        }
+    }
+
+    m_habitatInventory.clear();
+    for (const auto& habitat : m_habitats) {
+        auto habitatPtr = std::make_shared<Habitat>(habitat);
+        m_habitatInventory.addItem(habitatPtr);
+    }
+}
+
+void Zoo::displayAllInventories() const {
+    m_allAnimalsInventory.displayInventory();
+    m_habitatInventory.displayInventory();
+}
+
 bool Zoo::spendMoney(float amount)
 {
     if (m_budget >= amount)
@@ -255,16 +277,12 @@ bool Zoo::deleteHabitatAt(int habitatIndex)
         throw HabitatException("Invalid habitat index: " + std::to_string(habitatIndex));
     }
 
-    // Calculate the refund amount (50% of the habitat price)
     float refundAmount = calculateRefund(m_habitats[habitatIndex].getPrice());
 
-    // Get habitat type for logging
     std::string habitatType = m_habitats[habitatIndex].getType();
 
-    // Remove the habitat (the destructor will be called automatically)
     m_habitats.erase(m_habitats.begin() + habitatIndex);
 
-    // Add the refund to the budget
     m_budget += refundAmount;
 
     std::cout << "Deleted " << habitatType << " habitat and received $" << refundAmount << " refund." << std::endl;
@@ -273,7 +291,7 @@ bool Zoo::deleteHabitatAt(int habitatIndex)
 
 float Zoo::calculateRefund(float originalPrice) const
 {
-    return originalPrice * 0.5f; // 50% refund
+    return originalPrice * 0.5f;
 }
 
 bool Zoo::loadTexture(sf::Texture &texture, const std::string &primaryPath, const std::string &backupPath,

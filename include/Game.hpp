@@ -9,17 +9,14 @@
 class Game
 {
 public:
-    // Metodă statică pentru a obține instanța singleton
     static Game& getInstance();
 
-    // Previne copierea și atribuirea
     Game(const Game&) = delete;
     Game& operator=(const Game&) = delete;
 
     void run();
 
 private:
-    // Constructor privat pentru singleton
     Game();
 
     bool loadTexture(sf::Texture &texture, const std::string &primaryPath, const std::string &backupPath,
@@ -71,7 +68,6 @@ private:
     std::map<std::string, sf::Texture> m_animalTextures;
     std::vector<std::vector<std::string> > m_animalsInHabitat;
 
-    // Habitat move functionality
     sf::RectangleShape m_moveHabitatButton;
     sf::Text m_moveHabitatButtonText;
     bool m_isMovingHabitat;
@@ -79,7 +75,6 @@ private:
     int m_originalHabitatX;
     int m_originalHabitatY;
     
-    // Path building functionality
     sf::RectangleShape m_buildPathButton;
     sf::Text m_buildPathButtonText;
     bool m_isBuildingPath;
@@ -88,11 +83,14 @@ private:
     int m_lastPathX;
     int m_lastPathY;
 
-    // Delete functionality
     sf::RectangleShape m_deleteButton;
     sf::Text m_deleteButtonText;
     bool m_isDeletingObject;
     int m_deletingObjectIndex;
+
+    sf::RectangleShape m_showInventoryButton;
+    sf::Text m_showInventoryButtonText;
+    bool m_showingInventory;
 
     Zoo m_zoo;
 };

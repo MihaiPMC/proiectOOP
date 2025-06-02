@@ -376,7 +376,7 @@ std::shared_ptr<Animal> Animal::createRandomAnimal(const std::string &species, i
     } else if (species == "Octopus") {
         std::vector<std::string> abilities = {"expert", "advanced", "basic"};
         std::uniform_int_distribution<> distAbility(0, abilities.size() - 1);
-        std::uniform_int_distribution<> distTentacles(8, 8);  // Always 8 tentacles
+        std::uniform_int_distribution<> distTentacles(8, 8);
         return std::make_shared<Octopus>(
             getRandomName(), species, distAge(gen), 10.0f, 30.0f,
             distTentacles(gen), abilities[distAbility(gen)], distHealth(gen), 1500, 0.0f
@@ -413,7 +413,6 @@ std::shared_ptr<Animal> Animal::createRandomAnimal(const std::string &species, i
         );
     }
 
-    // Default fallback (should not be reached with proper animal types)
     return std::make_shared<Bear>(
         getRandomName(),
         species,

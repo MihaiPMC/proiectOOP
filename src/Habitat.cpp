@@ -4,7 +4,6 @@
 #include <map>
 #include <vector>
 
-// Define static member variable
 std::map<std::string, std::vector<std::string> > Habitat::s_habitatSpecies = {
     {"Desert", {"camel", "coyote", "scorpion"}},
     {"Forest", {"bear", "fox", "wolf"}},
@@ -106,6 +105,8 @@ void Habitat::addAnimal(const std::shared_ptr<Animal> &animal) {
     }
 
     m_animals.push_back(animal);
+
+    std::cout << "Animal " << animal->getName() << " added to " << m_type << " habitat." << std::endl;
 }
 
 int Habitat::getCapacity() const {

@@ -9,6 +9,7 @@
 #include "Animal.hpp"
 #include "Habitat.hpp"
 #include "exception/ZooExceptions.hpp"
+#include "AnimalInventory.hpp"
 
 class Zoo
 {
@@ -18,6 +19,10 @@ private:
     int m_visitorCount;
     bool m_isOpen;
     float m_budget;
+
+    // Inventare pentru diferite tipuri de entități
+    AnimalInventory<Animal> m_allAnimalsInventory{"All Animals", 200};
+    AnimalInventory<Habitat> m_habitatInventory{"Habitats", 50};
 
 public:
     Zoo(const std::string &name, const std::vector<Habitat> &habitats, int visitor_count, bool is_open,
@@ -88,6 +93,14 @@ public:
     void highlightHabitatAt(sf::RenderWindow& window, int tileSize, int index, const sf::Color& color) const;
 
     friend std::ostream &operator<<(std::ostream &os, const Zoo &zoo);
+
+    // Getter-i pentru inventare
+    AnimalInventory<Animal>& getAllAnimalsInventory() { return m_allAnimalsInventory; }
+    AnimalInventory<Habitat>& getHabitatInventory() { return m_habitatInventory; }
+
+    // Metode pentru gestionarea inventarelor
+    void syncInventoryWithHabitats();
+    void displayAllInventories() const;
 };
 
 #endif //ZOO_H

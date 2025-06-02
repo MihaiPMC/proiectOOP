@@ -9,13 +9,11 @@
 #include <sstream>
 static const int UI_MARGIN = 50;
 
-// Metodă statică pentru a obține instanța singleton
 Game& Game::getInstance() {
-    static Game instance; // Lazy initialization, thread-safe în C++11
+    static Game instance;
     return instance;
 }
 
-// Constructorul acum este privat
 Game::Game()
     : m_window(),
       m_windowWidth(1800),
@@ -81,7 +79,6 @@ Game::Game()
     m_inputText.setCharacterSize(40);
     m_inputText.setFillColor(sf::Color::Yellow);
 
-    // Use the moved methods from Zoo class
     Zoo::nameInput(m_window, m_font, m_zooName, m_nameEntered);
     Zoo::showTutorial(m_window, m_font);
 
@@ -164,7 +161,6 @@ Game::Game()
     m_buildPathButtonText.setPosition(m_buildPathButton.getPosition().x + 10,
                                       m_buildPathButton.getPosition().y + 5);
 
-    // Initialize delete button
     m_deleteButton.setSize(sf::Vector2f(150, 40));
     m_deleteButton.setFillColor(sf::Color(200, 0, 0));
     m_deleteButton.setPosition(m_buildPathButton.getPosition().x + m_buildPathButton.getSize().x + 10,
@@ -177,6 +173,8 @@ Game::Game()
                                    m_deleteButton.getPosition().y + 5);
     m_isDeletingObject = false;
     m_deletingObjectIndex = -1;
+
+    m_showingInventory = false;
 
     loadTexture(m_pathTexture, "images/path.png", "../images/path.png", sf::Color(153, 102, 51));
 
@@ -224,6 +222,20 @@ void Game::processEvents()
         if (event.type == sf::Event::Closed)
         {
             m_window.close();
+            return;
+        }
+
+        sf::Vector2f mousePos = sf::Vector2f(event.mouseButton.x, event.mouseButton.y);
+        if (m_showInventoryButton.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+            m_showingInventory = !m_showingInventory;
+            if (m_showingInventory) {
+                m_zoo.syncInventoryWithHabitats();
+                m_zoo.displayAllInventories();
+                m_statusMessage.setString("Inventory displayed in console");
+                m_statusMessage.setFillColor(sf::Color::Green);
+            } else {
+                m_statusMessage.setString("");
+            }
             return;
         }
         else if (event.type == sf::Event::Resized)
@@ -307,7 +319,6 @@ void Game::processEvents()
                 }
                 else
                 {
-                    // Check if user clicked on a habitat
                     int gridX = mousePos.x / m_tileSize;
                     int gridY = mousePos.y / m_tileSize;
 
@@ -317,10 +328,8 @@ void Game::processEvents()
                     {
                         try
                         {
-                            // Delete the habitat and get refund
                             if (m_zoo.deleteHabitatAt(habitatIndex))
                             {
-                                // Also update the internal representation
                                 if (habitatIndex < static_cast<int>(m_habitatBuildings.size()))
                                 {
                                     m_habitatBuildings.erase(m_habitatBuildings.begin() + habitatIndex);
@@ -495,6 +504,8 @@ void Game::processEvents()
                                                                         hy;
                                                              });
 
+    m_zoo.syncInventoryWithHabitats();
+
                                 if (pathIt != m_pathTiles.end())
                                 {
                                     std::cout << "Removed path at (" << hx << "," << hy
@@ -618,6 +629,8 @@ void Game::processEvents()
                             catch (const std::exception &e)
                             {
                                 std::cout << "Error: " << e.what() << std::endl;
+
+                                    m_zoo.syncInventoryWithHabitats();
                             }
 
                             m_isAddingAnimal = false;
@@ -763,6 +776,20 @@ void Game::update()
 
                         bool overlapsX = (cellX >= hx && cellX < hx + 3);
                         bool overlapsY = (cellY >= hy && cellY < hy + 3);
+
+m_showInventoryButton.setSize(sf::Vector2f(150, 40));
+m_showInventoryButton.setPosition(m_windowWidth - 160, m_windowHeight - 50);
+m_showInventoryButton.setFillColor(sf::Color(100, 100, 200));
+
+m_showInventoryButtonText.setFont(m_font);
+m_showInventoryButtonText.setString("Show Inventory");
+m_showInventoryButtonText.setCharacterSize(16);
+m_showInventoryButtonText.setFillColor(sf::Color::White);
+sf::FloatRect textBounds = m_showInventoryButtonText.getLocalBounds();
+m_showInventoryButtonText.setPosition(
+    m_showInventoryButton.getPosition().x + (m_showInventoryButton.getSize().x - textBounds.width) / 2,
+    m_showInventoryButton.getPosition().y + (m_showInventoryButton.getSize().y - textBounds.height) / 2 - 5
+);
 
                         if (overlapsX && overlapsY)
                         {
@@ -913,14 +940,11 @@ void Game::render()
         m_window.draw(pathSprite);
     }
 
-    // Use the Zoo class to render habitats and animals
     m_zoo.renderHabitats(m_window, m_tileSize, m_habitatTextures, m_animalTextures);
 
-    // If moving a habitat, highlight it
     if (m_isMovingHabitat && m_movingHabitatIndex != -1) {
         m_zoo.highlightHabitatAt(m_window, m_tileSize, m_movingHabitatIndex, sf::Color(255, 165, 0));
 
-        // Show the new position preview
         sf::Vector2i mousePos = sf::Mouse::getPosition(m_window);
         int newX = mousePos.x / m_tileSize;
         int newY = mousePos.y / m_tileSize;
@@ -951,6 +975,8 @@ void Game::render()
         if (isValidPosition) {
             newPositionPreview.setFillColor(sf::Color(0, 255, 0, 80));
             newPositionPreview.setOutlineColor(sf::Color::Green);
+
+                        m_zoo.syncInventoryWithHabitats();
         } else {
             newPositionPreview.setFillColor(sf::Color(255, 0, 0, 80));
             newPositionPreview.setOutlineColor(sf::Color::Red);
@@ -1152,6 +1178,9 @@ void Game::render()
     {
         m_window.draw(m_statusMessage);
     }
+
+    m_window.draw(m_showInventoryButton);
+    m_window.draw(m_showInventoryButtonText);
 
     m_window.display();
 }
