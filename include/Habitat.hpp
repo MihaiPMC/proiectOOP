@@ -7,10 +7,6 @@
 #include <memory>
 #include <SFML/Graphics.hpp>
 #include "exception/ZooExceptions.hpp"
-#include "animals/Fish.hpp"
-#include "animals/Bird.hpp"
-#include "animals/Mammal.hpp"
-#include "animals/Reptile.hpp"
 
 class Habitat {
 private:

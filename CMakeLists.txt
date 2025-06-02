@@ -20,6 +20,9 @@ file(MAKE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/
 file(GLOB_RECURSE PROJECT_SOURCES "src/*.cpp" "include/*.cpp")
 file(GLOB_RECURSE PROJECT_HEADERS "src/*.h*" "include/*.h*")
 
+# Remove deleted animal classes from build
+list(FILTER PROJECT_SOURCES EXCLUDE REGEX "src/animals/(Bird|Fish|Mammal|Reptile)\.cpp$")
+
 # Create default main.cpp if no sources exist
 if(NOT PROJECT_SOURCES)
     set(DEFAULT_MAIN_CPP "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
