@@ -89,7 +89,7 @@ public:
         std::cout << "Cleared " << inventoryName << " inventory." << std::endl;
     }
 
-    // Funcție șablon pentru a aplica o operație pe toate elementele din inventar
+    // Funcție sablon pentru a aplica o operație pe toate elementele din inventar
     template<typename Func>
     void forEachItem(Func operation) const {
         for (const auto& item : items) {
@@ -97,7 +97,7 @@ public:
         }
     }
 
-    // Funcție șablon pentru a filtra și returna elemente care îndeplinesc o condiție
+    // Funcție sablon pentru a filtra și returna elemente care indeplinesc o condiție
     template<typename Predicate>
     std::vector<std::shared_ptr<T>> filterItems(Predicate condition) const {
         std::vector<std::shared_ptr<T>> result;
