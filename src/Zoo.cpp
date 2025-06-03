@@ -410,6 +410,30 @@ void Zoo::renderHabitats(sf::RenderWindow& window, int tileSize, const std::map<
     }
 }
 
+void Zoo::printAnimalDetails() const {
+    std::cout << "\nPrinting all animal details using template function:" << std::endl;
+    m_allAnimalsInventory.forEachItem([](const std::shared_ptr<Animal>& animal) {
+        if (animal) {
+            std::cout << "Animal: " << animal->getName() 
+                      << ", Height: " << animal->getHeight() 
+                      << ", Price: $" << animal->getPrice() << std::endl;
+        }
+    });
+}
+
+void Zoo::printHabitatDetails() const {
+    std::cout << "\nPrinting large habitats using template function:" << std::endl;
+    auto largeHabitats = m_habitatInventory.filterItems([](const std::shared_ptr<Habitat>& habitat) {
+        return habitat && habitat->getCapacity() > 3;
+    });
+
+    for (const auto& habitat : largeHabitats) {
+        std::cout << "Habitat Type: " << habitat->getType()
+                  << ", Capacity: " << habitat->getCapacity()
+                  << ", Cleanliness: " << habitat->getCleanlinessLevel() << std::endl;
+    }
+}
+
 void Zoo::highlightHabitatAt(sf::RenderWindow& window, int tileSize, int index, const sf::Color& color) const
 {
     if (index >= 0 && index < static_cast<int>(m_habitats.size())) {

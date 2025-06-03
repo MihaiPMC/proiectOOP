@@ -104,6 +104,9 @@ public:
 
     void displayHealthyAnimals(float minHealthThreshold = 0.7f) const;
     void displayExpensiveAnimals(int minPrice = 1000) const;
+
+    void printAnimalDetails() const;
+    void printHabitatDetails() const;
 };
 
 #endif //ZOO_H
