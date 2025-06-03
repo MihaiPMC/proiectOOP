@@ -267,8 +267,8 @@ void Game::processEvents()
         }
         else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
         {
-            sf::Vector2i mousePos = sf::Mouse::getPosition(m_window);
-            if (m_isAddingAnimal && m_addAnimalButton.getGlobalBounds().contains(mousePos.x, mousePos.y))
+            sf::Vector2i mousePosition = sf::Mouse::getPosition(m_window);
+            if (m_isAddingAnimal && m_addAnimalButton.getGlobalBounds().contains(mousePosition.x, mousePosition.y))
             {
                 m_isAddingAnimal = false;
                 m_selectedHabitatIndex = -1;
@@ -279,7 +279,7 @@ void Game::processEvents()
                 continue;
             }
             else if (!m_isAddingAnimal && !m_isMovingHabitat && m_addAnimalButton.getGlobalBounds().contains(
-                         mousePos.x, mousePos.y))
+                         mousePosition.x, mousePosition.y))
             {
                 m_isAddingAnimal = true;
                 m_selectedHabitatIndex = -1;
@@ -287,7 +287,7 @@ void Game::processEvents()
                 m_animalOptionButtons.clear();
                 m_animalOptionTexts.clear();
             }
-            else if (m_isMovingHabitat && m_moveHabitatButton.getGlobalBounds().contains(mousePos.x, mousePos.y))
+            else if (m_isMovingHabitat && m_moveHabitatButton.getGlobalBounds().contains(mousePosition.x, mousePosition.y))
             {
                 m_isMovingHabitat = false;
                 m_movingHabitatIndex = -1;
@@ -295,7 +295,7 @@ void Game::processEvents()
                 continue;
             }
             else if (!m_isAddingAnimal && !m_isBuildingHabitat && !m_showHabitatOptions && m_moveHabitatButton.
-                     getGlobalBounds().contains(mousePos.x, mousePos.y))
+                     getGlobalBounds().contains(mousePosition.x, mousePosition.y))
             {
                 m_isMovingHabitat = true;
                 m_movingHabitatIndex = -1;
@@ -304,15 +304,15 @@ void Game::processEvents()
             else if (!m_isAddingAnimal && !m_isBuildingHabitat && !m_showHabitatOptions && !m_isMovingHabitat && !
                      m_isBuildingPath && !m_isDeletingObject)
             {
-                if (m_buildHabitatButton.getGlobalBounds().contains(mousePos.x, mousePos.y))
+                if (m_buildHabitatButton.getGlobalBounds().contains(mousePosition.x, mousePosition.y))
                     m_showHabitatOptions = true;
-                else if (m_buildPathButton.getGlobalBounds().contains(mousePos.x, mousePos.y))
+                else if (m_buildPathButton.getGlobalBounds().contains(mousePosition.x, mousePosition.y))
                 {
                     m_isBuildingPath = true;
                     std::cout << "Building paths. Click on grid cells to place paths." << std::endl;
                     m_statusMessage.setString("Click on grid cells to build paths");
                 }
-                else if (m_deleteButton.getGlobalBounds().contains(mousePos.x, mousePos.y))
+                else if (m_deleteButton.getGlobalBounds().contains(mousePosition.x, mousePosition.y))
                 {
                     m_isDeletingObject = true;
                     m_deletingObjectIndex = -1;
@@ -322,7 +322,7 @@ void Game::processEvents()
             }
             else if (m_isBuildingPath)
             {
-                if (m_buildPathButton.getGlobalBounds().contains(mousePos.x, mousePos.y))
+                if (m_buildPathButton.getGlobalBounds().contains(mousePosition.x, mousePosition.y))
                 {
                     m_isBuildingPath = false;
                     m_lastPathX = -1;
@@ -333,7 +333,7 @@ void Game::processEvents()
             }
             else if (m_isDeletingObject)
             {
-                if (m_deleteButton.getGlobalBounds().contains(mousePos.x, mousePos.y))
+                if (m_deleteButton.getGlobalBounds().contains(mousePosition.x, mousePosition.y))
                 {
                     m_isDeletingObject = false;
                     m_deletingObjectIndex = -1;
@@ -342,8 +342,8 @@ void Game::processEvents()
                 }
                 else
                 {
-                    int gridX = mousePos.x / m_tileSize;
-                    int gridY = mousePos.y / m_tileSize;
+                    int gridX = mousePosition.x / m_tileSize;
+                    int gridY = mousePosition.y / m_tileSize;
 
                     int habitatIndex = m_zoo.findHabitatAt(gridX, gridY);
 
@@ -375,7 +375,7 @@ void Game::processEvents()
             }
             else if (m_showHabitatOptions)
             {
-                if (m_buildHabitatButton.getGlobalBounds().contains(mousePos.x, mousePos.y))
+                if (m_buildHabitatButton.getGlobalBounds().contains(mousePosition.x, mousePosition.y))
                 {
                     m_showHabitatOptions = false;
                     std::cout << "Habitat selection cancelled." << std::endl;
@@ -384,7 +384,7 @@ void Game::processEvents()
                 {
                     for (size_t i = 0; i < m_habitatOptionButtons.size(); i++)
                     {
-                        if (m_habitatOptionButtons[i].getGlobalBounds().contains(mousePos.x, mousePos.y))
+                        if (m_habitatOptionButtons[i].getGlobalBounds().contains(mousePosition.x, mousePosition.y))
                         {
                             m_selectedHabitatType = m_habitatOptionTexts[i].getString();
                             m_isBuildingHabitat = true;
@@ -397,7 +397,7 @@ void Game::processEvents()
             }
             else if (m_isBuildingHabitat)
             {
-                if (m_buildHabitatButton.getGlobalBounds().contains(mousePos.x, mousePos.y))
+                if (m_buildHabitatButton.getGlobalBounds().contains(mousePosition.x, mousePosition.y))
                 {
                     m_isBuildingHabitat = false;
                     m_selectedHabitatType = "";
@@ -405,8 +405,8 @@ void Game::processEvents()
                 }
                 else
                 {
-                    int cellX = mousePos.x / m_tileSize;
-                    int cellY = mousePos.y / m_tileSize;
+                    int cellX = mousePosition.x / m_tileSize;
+                    int cellY = mousePosition.y / m_tileSize;
 
                     try
                     {
@@ -458,8 +458,8 @@ void Game::processEvents()
             {
                 if (m_movingHabitatIndex == -1)
                 {
-                    int gridX = mousePos.x / m_tileSize;
-                    int gridY = mousePos.y / m_tileSize;
+                    int gridX = mousePosition.x / m_tileSize;
+                    int gridY = mousePosition.y / m_tileSize;
 
                     for (size_t i = 0; i < m_habitatBuildings.size(); i++)
                     {
@@ -479,8 +479,8 @@ void Game::processEvents()
                 }
                 else
                 {
-                    int newX = mousePos.x / m_tileSize;
-                    int newY = mousePos.y / m_tileSize;
+                    int newX = mousePosition.x / m_tileSize;
+                    int newY = mousePosition.y / m_tileSize;
 
                     bool isValidPosition = true;
 
@@ -563,8 +563,8 @@ void Game::processEvents()
             {
                 if (m_selectedHabitatIndex == -1)
                 {
-                    int gridX = mousePos.x / m_tileSize;
-                    int gridY = mousePos.y / m_tileSize;
+                    int gridX = mousePosition.x / m_tileSize;
+                    int gridY = mousePosition.y / m_tileSize;
 
                     int habitatIndex = m_zoo.findHabitatAt(gridX, gridY);
 
@@ -627,7 +627,7 @@ void Game::processEvents()
                 {
                     for (size_t i = 0; i < m_animalOptionButtons.size(); i++)
                     {
-                        if (m_animalOptionButtons[i].getGlobalBounds().contains(mousePos.x, mousePos.y))
+                        if (m_animalOptionButtons[i].getGlobalBounds().contains(mousePosition.x, mousePosition.y))
                         {
                             m_selectedAnimalType = m_animalOptionTexts[i].getString();
 
