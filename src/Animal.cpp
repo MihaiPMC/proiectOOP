@@ -14,6 +14,7 @@
 #include "../include/animals/Lion.hpp"
 #include "../include/animals/Zebra.hpp"
 #include "../include/animals/Coyote.hpp"
+#include "../include/animals/AnimalFactory.hpp"
 #include <random>
 #include <iostream>
 
@@ -294,124 +295,23 @@ std::shared_ptr<Animal> Animal::createRandomAnimal(const std::string &species, i
     std::uniform_real_distribution<float> distHeight(20.0f, 150.0f);
     std::uniform_real_distribution<float> distHealth(0.7f, 1.0f);
 
-    // Desert animals
-    if (species == "Camel") {
-        std::uniform_int_distribution<> distHumps(1, 2);
-        return std::make_shared<Camel>(
-            getRandomName(), species, distAge(gen), distWeight(gen), distHeight(gen),
-            distHumps(gen), distHealth(gen), 1200, 0.0f
-        );
-    } else if (species == "Coyote") {
-        std::vector<std::string> coatColors = {"tan", "gray", "reddish-brown"};
-        std::uniform_int_distribution<> distColor(0, coatColors.size() - 1);
-        std::uniform_real_distribution<float> distHunting(0.4f, 0.9f);
-        return std::make_shared<Coyote>(
-            getRandomName(), species, distAge(gen), 15.0f, 50.0f,
-            distHunting(gen), coatColors[distColor(gen)], distHealth(gen), 900, 0.0f
-        );
-    } else if (species == "Scorpion") {
-        std::uniform_real_distribution<float> distVenom(0.1f, 0.9f);
-        return std::make_shared<Scorpion>(
-            getRandomName(), species, distAge(gen), 0.5f, 5.0f,
-            distVenom(gen), distHealth(gen), 500, 0.0f
+    auto& factory = AnimalFactory::getInstance();
+    if (factory.supportsSpecies(species)) {
+        return factory.createAnimal(
+            species,
+            getRandomName(),
+            distAge(gen),
+            distWeight(gen),
+            distHeight(gen),
+            distHealth(gen),
+            1000,
+            0.0f
         );
     }
-    // Forest animals
-    else if (species == "Bear") {
-        std::vector<std::string> furColors = {"brown", "black", "grizzly"};
-        std::uniform_int_distribution<> distColor(0, furColors.size() - 1);
-        std::uniform_real_distribution<float> distHibernation(3.0f, 5.0f);
-        return std::make_shared<Bear>(
-            getRandomName(), species, distAge(gen), distWeight(gen), distHeight(gen),
-            furColors[distColor(gen)], distHibernation(gen), distHealth(gen), 1500, 0.0f
-        );
-    } else if (species == "Fox") {
-        std::vector<std::string> patterns = {"red", "silver", "cross"};
-        std::uniform_int_distribution<> distPattern(0, patterns.size() - 1);
-        std::uniform_real_distribution<float> distStealth(0.5f, 0.9f);
-        return std::make_shared<Fox>(
-            getRandomName(), species, distAge(gen), 15.0f, 40.0f,
-            patterns[distPattern(gen)], distStealth(gen), distHealth(gen), 800, 0.0f
-        );
-    } else if (species == "Wolf") {
-        std::vector<std::string> roles = {"alpha", "beta", "omega"};
-        std::uniform_int_distribution<> distRole(0, roles.size() - 1);
-        std::uniform_int_distribution<> distPackSize(5, 12);
-        return std::make_shared<Wolf>(
-            getRandomName(), species, distAge(gen), distWeight(gen), distHeight(gen),
-            roles[distRole(gen)], distPackSize(gen), distHealth(gen), 1200, 0.0f
-        );
-    }
-    // Mountain animals
-    else if (species == "Eagle") {
-        std::uniform_real_distribution<float> distWingspan(1.5f, 2.5f);
-        std::uniform_real_distribution<float> distAltitude(1000.0f, 3000.0f);
-        return std::make_shared<Eagle>(
-            getRandomName(), species, distAge(gen), 6.0f, 80.0f,
-            distWingspan(gen), distAltitude(gen), distHealth(gen), 1100, 0.0f
-        );
-    } else if (species == "Goat") {
-        std::uniform_real_distribution<float> distHorn(10.0f, 30.0f);
-        std::uniform_int_distribution<> distClimber(0, 1);
-        return std::make_shared<Goat>(
-            getRandomName(), species, distAge(gen), 70.0f, 90.0f,
-            distHorn(gen), distClimber(gen) == 1, distHealth(gen), 700, 0.0f
-        );
-    } else if (species == "Yak") {
-        std::uniform_real_distribution<float> distWool(5.0f, 15.0f);
-        std::uniform_real_distribution<float> distCold(30.0f, 50.0f);
-        return std::make_shared<Yak>(
-            getRandomName(), species, distAge(gen), 500.0f, 180.0f,
-            distWool(gen), distCold(gen), distHealth(gen), 1300, 0.0f
-        );
-    }
-    // Ocean animals
-    else if (species == "Dolphin") {
-        std::uniform_real_distribution<float> distIntelligence(8.0f, 10.0f);
-        std::uniform_real_distribution<float> distSpeed(30.0f, 50.0f);
-        return std::make_shared<Dolphin>(
-            getRandomName(), species, distAge(gen), 200.0f, 250.0f,
-            distIntelligence(gen), distSpeed(gen), distHealth(gen), 1800, 0.0f
-        );
-    } else if (species == "Octopus") {
-        std::vector<std::string> abilities = {"expert", "advanced", "basic"};
-        std::uniform_int_distribution<> distAbility(0, abilities.size() - 1);
-        std::uniform_int_distribution<> distTentacles(8, 8);
-        return std::make_shared<Octopus>(
-            getRandomName(), species, distAge(gen), 10.0f, 30.0f,
-            distTentacles(gen), abilities[distAbility(gen)], distHealth(gen), 1500, 0.0f
-        );
-    } else if (species == "Seaturtle") {
-        std::uniform_real_distribution<float> distShell(7.0f, 10.0f);
-        std::uniform_int_distribution<> distMigration(1000, 5000);
-        return std::make_shared<Seaturtle>(
-            getRandomName(), species, distAge(gen), 150.0f, 60.0f,
-            distShell(gen), distMigration(gen), distHealth(gen), 1100, 0.0f
-        );
-    }
-    // Savanna animals
-    else if (species == "Elephant") {
-        std::uniform_real_distribution<float> distTrunk(1.5f, 2.5f);
-        std::uniform_real_distribution<float> distTusk(0.5f, 1.5f);
-        return std::make_shared<Elephant>(
-            getRandomName(), species, distAge(gen), 5000.0f, 300.0f,
-            distTrunk(gen), distTusk(gen), distHealth(gen), 2000, 0.0f
-        );
-    } else if (species == "Lion") {
-        std::uniform_real_distribution<float> distMane(15.0f, 30.0f);
-        std::uniform_real_distribution<float> distRoar(80.0f, 114.0f);
-        return std::make_shared<Lion>(
-            getRandomName(), species, distAge(gen), 200.0f, 110.0f,
-            distMane(gen), distRoar(gen), distHealth(gen), 1800, 0.0f
-        );
-    } else if (species == "Zebra") {
-        std::uniform_int_distribution<> distStripes(40, 80);
-        std::uniform_real_distribution<float> distSpeed(40.0f, 65.0f);
-        return std::make_shared<Zebra>(
-            getRandomName(), species, distAge(gen), 350.0f, 140.0f,
-            distStripes(gen), distSpeed(gen), distHealth(gen), 1000, 0.0f
-        );
-    }
+
+    std::vector<std::string> furColors = {"brown", "black", "grizzly"};
+    std::uniform_int_distribution<> distColor(0, furColors.size() - 1);
+    std::uniform_real_distribution<float> distHibernation(3.0f, 5.0f);
 
     return std::make_shared<Bear>(
         getRandomName(),
@@ -419,8 +319,8 @@ std::shared_ptr<Animal> Animal::createRandomAnimal(const std::string &species, i
         distAge(gen),
         distWeight(gen),
         distHeight(gen),
-        "brown",
-        4.0f,
+        furColors[distColor(gen)],
+        distHibernation(gen),
         distHealth(gen),
         1000,
         0.0f

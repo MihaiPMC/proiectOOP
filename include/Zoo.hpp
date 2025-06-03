@@ -10,6 +10,7 @@
 #include "Habitat.hpp"
 #include "exception/ZooExceptions.hpp"
 #include "AnimalInventory.hpp"
+#include "animals/AnimalFactory.hpp"
 
 class Zoo
 {
