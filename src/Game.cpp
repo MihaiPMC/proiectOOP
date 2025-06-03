@@ -66,7 +66,8 @@ Game::Game()
       m_deleteButtonText(),
       m_isDeletingObject(false),
       m_deletingObjectIndex(-1),
-      m_zoo("Default Zoo", {}, 0, true)
+      m_zoo("Default Zoo", {}, 0, true),
+      m_showingInventory(false)
 {
     m_window.create(sf::VideoMode(m_windowWidth, m_windowHeight), "Zoo Tycoon - Enter Zoo Name");
     if (!m_font.loadFromFile("fonts/DUSHICK.otf"))
@@ -123,6 +124,11 @@ Game::Game()
     m_buildHabitatButton.setSize(sf::Vector2f(150, 40));
     m_buildHabitatButton.setFillColor(sf::Color(100, 100, 200));
     m_buildHabitatButton.setPosition(10, gridAreaHeight + (UI_MARGIN - m_buildHabitatButton.getSize().y) / 2);
+    // Ensure show inventory button is always positioned properly
+    if (m_showInventoryButton.getSize().x > 0) {
+        m_showInventoryButton.setPosition(m_buildHabitatButton.getPosition().x + m_buildHabitatButton.getSize().x + 20, 
+                                        gridAreaHeight + (UI_MARGIN - m_showInventoryButton.getSize().y) / 2);
+    }
     m_buildHabitatButtonText.setFont(m_font);
     m_buildHabitatButtonText.setCharacterSize(20);
     m_buildHabitatButtonText.setFillColor(sf::Color::White);
@@ -174,7 +180,24 @@ Game::Game()
     m_isDeletingObject = false;
     m_deletingObjectIndex = -1;
 
-    m_showingInventory = false;
+    // Initialize show inventory button
+    m_showInventoryButton.setSize(sf::Vector2f(150, 40));
+    m_showInventoryButton.setFillColor(sf::Color(0, 100, 150));
+    m_showInventoryButton.setOutlineColor(sf::Color::Black);
+    m_showInventoryButton.setOutlineThickness(2);
+    m_showInventoryButton.setPosition(m_deleteButton.getPosition().x + m_deleteButton.getSize().x + 10,
+                                     m_buildHabitatButton.getPosition().y);
+
+    // Initialize show inventory button text
+    m_showInventoryButtonText.setFont(m_font);
+    m_showInventoryButtonText.setString("Show Inventory");
+    m_showInventoryButtonText.setCharacterSize(16);
+    m_showInventoryButtonText.setFillColor(sf::Color::White);
+    sf::FloatRect textBounds = m_showInventoryButtonText.getLocalBounds();
+    m_showInventoryButtonText.setPosition(
+        m_showInventoryButton.getPosition().x + (m_showInventoryButton.getSize().x - textBounds.width) / 2,
+        m_showInventoryButton.getPosition().y + (m_showInventoryButton.getSize().y - textBounds.height) / 2 - 5
+    );
 
     loadTexture(m_pathTexture, "images/path.png", "../images/path.png", sf::Color(153, 102, 51));
 
@@ -686,6 +709,15 @@ void Game::handleResize(unsigned int width, unsigned int height)
                                   m_buildHabitatButton.getPosition().y);
         m_deleteButtonText.setPosition(m_deleteButton.getPosition().x + 10,
                                        m_deleteButton.getPosition().y + 5);
+
+                                               // Reposition inventory button on resize - next to delete button
+                                               m_showInventoryButton.setPosition(m_deleteButton.getPosition().x + m_deleteButton.getSize().x + 10,
+                                                                              m_buildHabitatButton.getPosition().y);
+                                               sf::FloatRect textBounds = m_showInventoryButtonText.getLocalBounds();
+                                               m_showInventoryButtonText.setPosition(
+                                                   m_showInventoryButton.getPosition().x + (m_showInventoryButton.getSize().x - textBounds.width) / 2,
+                                                   m_showInventoryButton.getPosition().y + (m_showInventoryButton.getSize().y - textBounds.height) / 2 - 5
+                                               );
         float btnWidth = 120, btnHeight = 40;
         float startX = m_buildHabitatButton.getPosition().x;
         float startY = m_buildHabitatButton.getPosition().y + m_buildHabitatButton.getSize().y + 10;
@@ -777,19 +809,7 @@ void Game::update()
                         bool overlapsX = (cellX >= hx && cellX < hx + 3);
                         bool overlapsY = (cellY >= hy && cellY < hy + 3);
 
-m_showInventoryButton.setSize(sf::Vector2f(150, 40));
-m_showInventoryButton.setPosition(m_windowWidth - 160, m_windowHeight - 50);
-m_showInventoryButton.setFillColor(sf::Color(100, 100, 200));
-
-m_showInventoryButtonText.setFont(m_font);
-m_showInventoryButtonText.setString("Show Inventory");
-m_showInventoryButtonText.setCharacterSize(16);
-m_showInventoryButtonText.setFillColor(sf::Color::White);
-sf::FloatRect textBounds = m_showInventoryButtonText.getLocalBounds();
-m_showInventoryButtonText.setPosition(
-    m_showInventoryButton.getPosition().x + (m_showInventoryButton.getSize().x - textBounds.width) / 2,
-    m_showInventoryButton.getPosition().y + (m_showInventoryButton.getSize().y - textBounds.height) / 2 - 5
-);
+// Inventory button is now initialized in the constructor
 
                         if (overlapsX && overlapsY)
                         {
@@ -1145,6 +1165,16 @@ void Game::render()
 
     m_window.draw(m_buildHabitatButton);
     m_window.draw(m_buildHabitatButtonText);
+
+    // Draw Show Inventory button
+    m_window.draw(m_showInventoryButton);
+    m_window.draw(m_showInventoryButtonText);
+
+    // Update text position
+    m_showInventoryButtonText.setPosition(
+        m_showInventoryButton.getPosition().x + (m_showInventoryButton.getSize().x - m_showInventoryButtonText.getLocalBounds().width) / 2,
+        m_showInventoryButton.getPosition().y + (m_showInventoryButton.getSize().y - m_showInventoryButtonText.getLocalBounds().height) / 2 - 5
+    );
     m_window.draw(m_addAnimalButton);
     m_window.draw(m_addAnimalButtonText);
     m_window.draw(m_moveHabitatButton);
@@ -1171,16 +1201,14 @@ void Game::render()
     budgetText.setCharacterSize(20);
     budgetText.setFillColor(sf::Color::White);
     budgetText.setString("Budget: $" + std::to_string(static_cast<int>(m_zoo.getBudget())));
-    budgetText.setPosition(m_windowWidth - 200, m_gridHeight * m_tileSize + 10);
+    budgetText.setPosition(m_showInventoryButton.getPosition().x + m_showInventoryButton.getSize().x + 20, 
+                          m_gridHeight * m_tileSize + 10);
     m_window.draw(budgetText);
 
     if (!m_statusMessage.getString().isEmpty())
     {
         m_window.draw(m_statusMessage);
     }
-
-    m_window.draw(m_showInventoryButton);
-    m_window.draw(m_showInventoryButtonText);
 
     m_window.display();
 }

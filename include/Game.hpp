@@ -88,9 +88,9 @@ private:
     bool m_isDeletingObject;
     int m_deletingObjectIndex;
 
+    Zoo m_zoo;
+
+    bool m_showingInventory;
     sf::RectangleShape m_showInventoryButton;
     sf::Text m_showInventoryButtonText;
-    bool m_showingInventory;
-
-    Zoo m_zoo;
 };

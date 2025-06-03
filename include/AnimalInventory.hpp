@@ -14,7 +14,7 @@ private:
 
 public:
     AnimalInventory(const std::string &name, size_t capacity = 100)
-        : inventoryName(name), maxCapacity(capacity) {
+        : maxCapacity(capacity), inventoryName(name) {
     }
 
     bool addItem(const std::shared_ptr<T> &item) {

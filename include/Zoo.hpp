@@ -20,7 +20,6 @@ private:
     bool m_isOpen;
     float m_budget;
 
-    // Inventare pentru diferite tipuri de entități
     AnimalInventory<Animal> m_allAnimalsInventory{"All Animals", 200};
     AnimalInventory<Habitat> m_habitatInventory{"Habitats", 50};
 
@@ -72,13 +71,10 @@ public:
 
     bool addAnimalTo(int habitatIndex, const std::string &animalType);
     
-    // Delete habitat and get refund
     bool deleteHabitatAt(int habitatIndex);
 
-    // Calculate refund amount (50% of price)
     float calculateRefund(float originalPrice) const;
 
-    // UI and rendering related methods
     static bool loadTexture(sf::Texture &texture, const std::string &primaryPath, const std::string &backupPath,
                           sf::Color fallbackColor);
     
@@ -94,13 +90,20 @@ public:
 
     friend std::ostream &operator<<(std::ostream &os, const Zoo &zoo);
 
-    // Getter-i pentru inventare
     AnimalInventory<Animal>& getAllAnimalsInventory() { return m_allAnimalsInventory; }
     AnimalInventory<Habitat>& getHabitatInventory() { return m_habitatInventory; }
 
-    // Metode pentru gestionarea inventarelor
     void syncInventoryWithHabitats();
     void displayAllInventories() const;
+
+    // Methods using template functions
+    float calculateAverageAnimalHealth() const;
+    int calculateTotalAnimalValue() const;
+    float calculateAverageHabitatCleanliness() const;
+    int calculateTotalHabitatCapacity() const;
+
+    void displayHealthyAnimals(float minHealthThreshold = 0.7f) const;
+    void displayExpensiveAnimals(int minPrice = 1000) const;
 };
 
 #endif //ZOO_H
