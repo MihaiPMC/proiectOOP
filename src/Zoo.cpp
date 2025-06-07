@@ -462,3 +462,59 @@ void Zoo::highlightHabitatAt(sf::RenderWindow& window, int tileSize, int index, 
         m_habitats[index].highlightHabitat(window, tileSize, color, 2.0f);
     }
 }
+float Zoo::calculateAverageAnimalHealth() const {
+    int count = 0;
+    float total = 0.f;
+    for (const auto& habitat : m_habitats) {
+        for (const auto& animal : habitat.getAnimals()) {
+            if (animal) {
+                total += animal->getIsHealthy();
+                ++count;
+            }
+        }
+    }
+    return count > 0 ? total / count : 0.f;
+}
+
+int Zoo::calculateTotalAnimalValue() const {
+    int total = 0;
+    for (const auto& habitat : m_habitats) {
+        for (const auto& animal : habitat.getAnimals()) {
+            if (animal) total += animal->getPrice();
+        }
+    }
+    return total;
+}
+
+float Zoo::calculateAverageHabitatCleanliness() const {
+    if (m_habitats.empty()) return 0.f;
+    float total = 0.f;
+    for (const auto& habitat : m_habitats) {
+        total += habitat.getCleanlinessLevel();
+    }
+    return total / static_cast<float>(m_habitats.size());
+}
+
+int Zoo::calculateTotalHabitatCapacity() const {
+    int total = 0;
+    for (const auto& habitat : m_habitats) {
+        total += habitat.getCapacity();
+    }
+    return total;
+}
+
+void Zoo::displayHealthyAnimals(float minHealthThreshold) const {
+    std::cout << "\nAnimals with health >= " << minHealthThreshold << ':' << std::endl;
+    m_allAnimalsInventory.forEachItem([&](const std::shared_ptr<Animal>& animal){
+        if (animal && animal->getIsHealthy() >= minHealthThreshold)
+            std::cout << *animal << std::endl;
+    });
+}
+
+void Zoo::displayExpensiveAnimals(int minPrice) const {
+    std::cout << "\nAnimals costing at least $" << minPrice << ':' << std::endl;
+    m_allAnimalsInventory.forEachItem([&](const std::shared_ptr<Animal>& animal){
+        if (animal && animal->getPrice() >= minPrice)
+            std::cout << *animal << std::endl;
+    });
+}
