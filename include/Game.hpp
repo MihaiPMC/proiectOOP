@@ -36,6 +36,8 @@ private:
 
     void syncZooDataForRendering();
 
+    void prepareInventoryDisplay();
+
     sf::RenderWindow m_window;
     unsigned int m_windowWidth, m_windowHeight;
     sf::Font m_font;
@@ -93,4 +95,6 @@ private:
     bool m_showingInventory;
     sf::RectangleShape m_showInventoryButton;
     sf::Text m_showInventoryButtonText;
+    sf::RectangleShape m_inventoryBackground;
+    std::vector<sf::Text> m_inventoryTexts;
 };

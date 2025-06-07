@@ -4,6 +4,7 @@
 #include "../include/exception/AnimalException.hpp"
 #include <algorithm>
 #include <random>
+#include <sstream>
 
 Zoo::Zoo(const std::string &name, const std::vector<Habitat> &habitats, int visitor_count, bool is_open, float budget)
     : m_name(name), m_habitats(habitats), m_visitorCount(visitor_count), m_isOpen(is_open), m_budget(budget)
@@ -133,6 +134,27 @@ void Zoo::syncInventoryWithHabitats() {
 void Zoo::displayAllInventories() const {
     m_allAnimalsInventory.displayInventory();
     m_habitatInventory.displayInventory();
+}
+
+std::string Zoo::getInventorySummary() const {
+    std::ostringstream oss;
+    oss << "=== " << m_allAnimalsInventory.getName() << " (" << m_allAnimalsInventory.getCount()
+        << "/" << m_allAnimalsInventory.getCapacity() << ") ===\n";
+    size_t idx = 1;
+    for (const auto &animal : m_allAnimalsInventory.getItems()) {
+        if (animal) {
+            oss << idx++ << ". " << *animal << "\n";
+        }
+    }
+    oss << "\n=== " << m_habitatInventory.getName() << " (" << m_habitatInventory.getCount()
+        << "/" << m_habitatInventory.getCapacity() << ") ===\n";
+    idx = 1;
+    for (const auto &hab : m_habitatInventory.getItems()) {
+        if (hab) {
+            oss << idx++ << ". " << *hab << "\n";
+        }
+    }
+    return oss.str();
 }
 
 bool Zoo::spendMoney(float amount)
