@@ -1265,7 +1265,6 @@ void Game::prepareInventoryDisplay()
     std::istringstream iss(summary);
     std::string line;
     float padding = 10.f;
-    float yOffset = padding;
     float maxWidth = 0.f;
     while (std::getline(iss, line))
     {
