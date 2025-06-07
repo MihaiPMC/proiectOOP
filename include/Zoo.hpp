@@ -97,6 +97,8 @@ public:
     void syncInventoryWithHabitats();
     void displayAllInventories() const;
 
+    std::string getInventorySummary() const;
+
     // Methods using template functions
     float calculateAverageAnimalHealth() const;
     int calculateTotalAnimalValue() const;

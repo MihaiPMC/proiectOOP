@@ -67,7 +67,9 @@ Game::Game()
       m_isDeletingObject(false),
       m_deletingObjectIndex(-1),
       m_zoo("Default Zoo", {}, 0, true),
-      m_showingInventory(false)
+      m_showingInventory(false),
+      m_inventoryBackground(),
+      m_inventoryTexts()
 {
     m_window.create(sf::VideoMode(m_windowWidth, m_windowHeight), "Zoo Tycoon - Enter Zoo Name");
     if (!m_font.loadFromFile("fonts/DUSHICK.otf"))
@@ -199,6 +201,10 @@ Game::Game()
         m_showInventoryButton.getPosition().y + (m_showInventoryButton.getSize().y - textBounds.height) / 2 - 5
     );
 
+    m_inventoryBackground.setFillColor(sf::Color(0, 0, 0, 200));
+    m_inventoryBackground.setOutlineColor(sf::Color::White);
+    m_inventoryBackground.setOutlineThickness(2);
+
     loadTexture(m_pathTexture, "images/path.png", "../images/path.png", sf::Color(153, 102, 51));
 
     m_statusMessage.setFont(m_font);
@@ -252,9 +258,8 @@ void Game::processEvents()
         if (m_showInventoryButton.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
             m_showingInventory = !m_showingInventory;
             if (m_showingInventory) {
-                m_zoo.syncInventoryWithHabitats();
-                m_zoo.displayAllInventories();
-                m_statusMessage.setString("Inventory displayed in console");
+                prepareInventoryDisplay();
+                m_statusMessage.setString("Showing inventory");
                 m_statusMessage.setFillColor(sf::Color::Green);
             } else {
                 m_statusMessage.setString("");
@@ -718,6 +723,9 @@ void Game::handleResize(unsigned int width, unsigned int height)
                                                    m_showInventoryButton.getPosition().x + (m_showInventoryButton.getSize().x - textBounds.width) / 2,
                                                    m_showInventoryButton.getPosition().y + (m_showInventoryButton.getSize().y - textBounds.height) / 2 - 5
                                                );
+
+        if (m_showingInventory)
+            prepareInventoryDisplay();
         float btnWidth = 120, btnHeight = 40;
         float startX = m_buildHabitatButton.getPosition().x;
         float startY = m_buildHabitatButton.getPosition().y + m_buildHabitatButton.getSize().y + 10;
@@ -1196,6 +1204,13 @@ void Game::render()
             m_window.draw(m_animalOptionTexts[i]);
         }
 
+    if (m_showingInventory)
+    {
+        m_window.draw(m_inventoryBackground);
+        for (const auto &text : m_inventoryTexts)
+            m_window.draw(text);
+    }
+
     sf::Text budgetText;
     budgetText.setFont(m_font);
     budgetText.setCharacterSize(20);
@@ -1240,4 +1255,40 @@ bool Game::loadTexture(sf::Texture& texture, const std::string& primaryPath, con
     texture.loadFromImage(fallbackImage);
     std::cout << "Using fallback texture" << std::endl;
     return false;
+}
+
+void Game::prepareInventoryDisplay()
+{
+    m_inventoryTexts.clear();
+    m_zoo.syncInventoryWithHabitats();
+    std::string summary = m_zoo.getInventorySummary();
+    std::istringstream iss(summary);
+    std::string line;
+    float padding = 10.f;
+    float maxWidth = 0.f;
+    while (std::getline(iss, line))
+    {
+        sf::Text text;
+        text.setFont(m_font);
+        text.setCharacterSize(14);
+        text.setFillColor(sf::Color::White);
+        text.setString(line);
+        m_inventoryTexts.push_back(text);
+        float w = text.getLocalBounds().width;
+        if (w > maxWidth)
+            maxWidth = w;
+    }
+
+    float backgroundWidth = maxWidth + 2 * padding;
+    float backgroundHeight = (m_inventoryTexts.size() * 18.f) + 2 * padding;
+    m_inventoryBackground.setSize(sf::Vector2f(backgroundWidth, backgroundHeight));
+    m_inventoryBackground.setPosition((m_windowWidth - backgroundWidth) / 2.f,
+                                      (m_windowHeight - backgroundHeight) / 2.f);
+
+    float currentY = m_inventoryBackground.getPosition().y + padding;
+    for (auto &text : m_inventoryTexts)
+    {
+        text.setPosition(m_inventoryBackground.getPosition().x + padding, currentY);
+        currentY += 18.f;
+    }
 }
